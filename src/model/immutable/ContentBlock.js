@@ -1,30 +1,42 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
+ * @providesModule ContentBlock
  * @flow
- * @emails oncall+draft_js
  */
 
 'use strict';
 
-import type {BlockNode, BlockNodeConfig, BlockNodeKey} from 'BlockNode';
+import type CharacterMetadata from 'CharacterMetadata';
 import type {DraftBlockType} from 'DraftBlockType';
 import type {DraftInlineStyle} from 'DraftInlineStyle';
 
-const CharacterMetadata = require('CharacterMetadata');
+var Immutable = require('immutable');
 
-const findRangesImmutable = require('findRangesImmutable');
-const Immutable = require('immutable');
+var findRangesImmutable = require('findRangesImmutable');
 
-const {List, Map, OrderedSet, Record, Repeat} = Immutable;
+var {
+  List,
+  Map,
+  OrderedSet,
+  Record,
+} = Immutable;
 
 const EMPTY_SET = OrderedSet();
 
-const defaultRecord: BlockNodeConfig = {
+var defaultRecord: {
+  key: string,
+  type: DraftBlockType,
+  text: string,
+  characterList: List<CharacterMetadata>,
+  depth: number,
+  data: Map<any, any>,
+} = {
   key: '',
   type: 'unstyled',
   text: '',
@@ -33,28 +45,10 @@ const defaultRecord: BlockNodeConfig = {
   data: Map(),
 };
 
-const ContentBlockRecord = (Record(defaultRecord): any);
+var ContentBlockRecord = Record(defaultRecord);
 
-const decorateCharacterList = (config: BlockNodeConfig): BlockNodeConfig => {
-  if (!config) {
-    return config;
-  }
-
-  const {characterList, text} = config;
-
-  if (text && !characterList) {
-    config.characterList = List(Repeat(CharacterMetadata.EMPTY, text.length));
-  }
-
-  return config;
-};
-
-class ContentBlock extends ContentBlockRecord implements BlockNode {
-  constructor(config: BlockNodeConfig) {
-    super(decorateCharacterList(config));
-  }
-
-  getKey(): BlockNodeKey {
+class ContentBlock extends ContentBlockRecord {
+  getKey(): string {
     return this.get('key');
   }
 
@@ -83,12 +77,12 @@ class ContentBlock extends ContentBlockRecord implements BlockNode {
   }
 
   getInlineStyleAt(offset: number): DraftInlineStyle {
-    const character = this.getCharacterList().get(offset);
+    var character = this.getCharacterList().get(offset);
     return character ? character.getStyle() : EMPTY_SET;
   }
 
   getEntityAt(offset: number): ?string {
-    const character = this.getCharacterList().get(offset);
+    var character = this.getCharacterList().get(offset);
     return character ? character.getEntity() : null;
   }
 

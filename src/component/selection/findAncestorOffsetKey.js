@@ -1,28 +1,27 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule findAncestorOffsetKey
+ * @typechecks
+ * @flow
  */
 
 'use strict';
 
-const getCorrectDocumentFromNode = require('getCorrectDocumentFromNode');
-const getSelectionOffsetKeyForNode = require('getSelectionOffsetKeyForNode');
+var getSelectionOffsetKeyForNode = require('getSelectionOffsetKeyForNode');
+
 /**
  * Get the key from the node's nearest offset-aware ancestor.
  */
 function findAncestorOffsetKey(node: Node): ?string {
   let searchNode = node;
-  while (
-    searchNode &&
-    searchNode !== getCorrectDocumentFromNode(node).documentElement
-  ) {
-    const key = getSelectionOffsetKeyForNode(searchNode);
+  while (searchNode && searchNode !== document.documentElement) {
+    var key = getSelectionOffsetKeyForNode(searchNode);
     if (key != null) {
       return key;
     }

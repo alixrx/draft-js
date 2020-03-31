@@ -1,48 +1,55 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @emails oncall+draft_js
- * @flow strict-local
- * @format
+ * @emails oncall+ui_infra
  */
 
 'use strict';
 
-const ContentBlock = require('ContentBlock');
+jest.disableAutomock();
 
-const applyEntityToContentBlock = require('applyEntityToContentBlock');
+var CharacterMetadata = require('CharacterMetadata');
+var ContentBlock = require('ContentBlock');
+var {
+  List,
+  Repeat,
+} = require('immutable');
 
-const sampleBlock = new ContentBlock({
-  key: 'a',
-  text: 'Hello',
-});
+var applyEntityToContentBlock = require('applyEntityToContentBlock');
 
-const assertApplyEntityToContentBlock = (
-  start,
-  end,
-  entityKey = 'x',
-  contentBlock = sampleBlock,
-) => {
-  expect(
-    applyEntityToContentBlock(contentBlock, start, end, entityKey).toJS(),
-  ).toMatchSnapshot();
-};
+describe('applyEntityToContentBlock', () => {
+  var block = new ContentBlock({
+    key: 'a',
+    text: 'Hello',
+    characterList: List(Repeat(CharacterMetadata.EMPTY, 5)),
+  });
 
-test('must apply from the start', () => {
-  assertApplyEntityToContentBlock(0, 2);
-});
+  function getEntities(block) {
+    return block.getCharacterList().map(c => c.getEntity()).toJS();
+  }
 
-test('must apply within', () => {
-  assertApplyEntityToContentBlock(1, 4);
-});
+  it('must apply from the start', () => {
+    var modified = applyEntityToContentBlock(block, 0, 2, 'x');
+    expect(getEntities(modified)).toEqual(['x', 'x', null, null, null]);
+  });
 
-test('must apply at the end', () => {
-  assertApplyEntityToContentBlock(3, 5);
-});
+  it('must apply within', () => {
+    var modified = applyEntityToContentBlock(block, 1, 4, 'x');
+    expect(getEntities(modified)).toEqual([null, 'x', 'x', 'x', null]);
+  });
 
-test('must apply to the entire text', () => {
-  assertApplyEntityToContentBlock(0, 5);
+  it('must apply at the end', () => {
+    var modified = applyEntityToContentBlock(block, 3, 5, 'x');
+    expect(getEntities(modified)).toEqual([null, null, null, 'x', 'x']);
+  });
+
+  it('must apply to the entire text', () => {
+    var modified = applyEntityToContentBlock(block, 0, 5, 'x');
+    expect(getEntities(modified)).toEqual(['x', 'x', 'x', 'x', 'x']);
+  });
 });

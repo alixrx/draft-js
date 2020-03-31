@@ -1,147 +1,176 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @emails oncall+draft_js
- * @flow strict-local
- * @format
+ * @emails oncall+ui_infra
  */
 
 'use strict';
 
-const ContentBlock = require('ContentBlock');
-const ContentState = require('ContentState');
-const EditorBidiService = require('EditorBidiService');
+jest.disableAutomock();
 
-const Immutable = require('immutable');
+var ContentBlock = require('ContentBlock');
+var ContentState = require('ContentState');
+var EditorBidiService = require('EditorBidiService');
+var Immutable = require('immutable');
+var UnicodeBidiDirection = require('UnicodeBidiDirection');
 
-const {OrderedMap, Seq} = Immutable;
+var {
+  OrderedMap,
+  Seq,
+} = Immutable;
 
-const ltr = new ContentBlock({
+var {
+  LTR,
+  RTL,
+} = UnicodeBidiDirection;
+
+var ltr = new ContentBlock({
   key: 'a',
   text: 'hello',
 });
-const rtl = new ContentBlock({
+var rtl = new ContentBlock({
   key: 'b',
   text: '\u05e9\u05d1\u05ea',
 });
-const empty = new ContentBlock({
+var empty = new ContentBlock({
   key: 'c',
   text: '',
 });
 
-const getContentState = blocks => {
-  const keys = Seq(blocks.map(b => b.getKey()));
-  const values = Seq(blocks);
-  const blockMap = OrderedMap(keys.zip(values));
-  return new ContentState({blockMap});
-};
+describe('EditorBidiService', () => {
+  function getContentState(blocks) {
+    var keys = Seq(blocks.map(b => b.getKey()));
+    var values = Seq(blocks);
+    var blockMap = OrderedMap(keys.zip(values));
+    return new ContentState({blockMap});
+  }
 
-test('must create a new map', () => {
-  const state = getContentState([ltr]);
-  const directions = EditorBidiService.getDirectionMap(state);
-  expect(directions.toJS()).toMatchSnapshot();
-});
-
-test('must return the same map if no changes', () => {
-  const state = getContentState([ltr]);
-  const directions = EditorBidiService.getDirectionMap(state);
-
-  const nextState = getContentState([ltr]);
-  const nextDirections = EditorBidiService.getDirectionMap(
-    nextState,
-    directions,
-  );
-
-  expect(state !== nextState).toMatchSnapshot();
-  expect(directions === nextDirections.toJS()).toMatchSnapshot();
-
-  expect(directions.toJS()).toMatchSnapshot();
-  expect(nextDirections.toJS()).toMatchSnapshot();
-});
-
-test('must return the same map if no text changes', () => {
-  const state = getContentState([ltr]);
-  const directions = EditorBidiService.getDirectionMap(state);
-
-  const newLTR = new ContentBlock({
-    key: 'a',
-    text: 'hello',
-  });
-  expect(newLTR !== ltr).toMatchSnapshot();
-
-  const nextState = getContentState([newLTR]);
-  const nextDirections = EditorBidiService.getDirectionMap(
-    nextState,
-    directions,
-  );
-
-  expect(state !== nextState).toMatchSnapshot();
-  expect(directions === nextDirections.toJS()).toMatchSnapshot();
-
-  expect(directions.toJS()).toMatchSnapshot();
-  expect(nextDirections.toJS()).toMatchSnapshot();
-});
-
-test('must return the same map if no directions change', () => {
-  const state = getContentState([ltr]);
-  const directions = EditorBidiService.getDirectionMap(state);
-
-  const newLTR = new ContentBlock({
-    key: 'a',
-    text: 'asdf',
+  it('must create a new map', () => {
+    var state = getContentState([ltr]);
+    var directions = EditorBidiService.getDirectionMap(state);
+    expect(
+      directions.keySeq().toArray(),
+    ).toEqual(
+      ['a'],
+    );
+    expect(
+      directions.valueSeq().toArray(),
+    ).toEqual(
+      [LTR],
+    );
   });
 
-  const nextState = getContentState([newLTR]);
-  const nextDirections = EditorBidiService.getDirectionMap(
-    nextState,
-    directions,
-  );
+  it('must return the same map if no changes', () => {
+    var state = getContentState([ltr]);
+    var directions = EditorBidiService.getDirectionMap(state);
 
-  expect(newLTR !== ltr).toMatchSnapshot();
-  expect(state !== nextState).toMatchSnapshot();
-  expect(directions === nextDirections.toJS()).toMatchSnapshot();
+    var nextState = getContentState([ltr]);
+    var nextDirections = EditorBidiService.getDirectionMap(
+      nextState,
+      directions,
+    );
 
-  expect(directions.toJS()).toMatchSnapshot();
-  expect(nextDirections.toJS()).toMatchSnapshot();
-});
-
-test('must return a new map if block keys change', () => {
-  const state = getContentState([ltr]);
-  const directions = EditorBidiService.getDirectionMap(state);
-
-  const newLTR = new ContentBlock({
-    key: 'asdf',
-    text: 'asdf',
+    expect(state).not.toBe(nextState);
+    expect(directions).toBe(nextDirections);
   });
 
-  const nextState = getContentState([newLTR]);
-  const nextDirections = EditorBidiService.getDirectionMap(
-    nextState,
-    directions,
-  );
+  it('must return the same map if no text changes', () => {
+    var state = getContentState([ltr]);
+    var directions = EditorBidiService.getDirectionMap(state);
 
-  expect(state !== nextState).toMatchSnapshot();
-  expect(directions !== nextDirections.toJS()).toMatchSnapshot();
+    var newLTR = new ContentBlock({
+      key: 'a',
+      text: 'hello',
+    });
+    expect(newLTR).not.toBe(ltr);
 
-  expect(directions.toJS()).toMatchSnapshot();
-  expect(nextDirections.toJS()).toMatchSnapshot();
-});
+    var nextState = getContentState([newLTR]);
+    var nextDirections = EditorBidiService.getDirectionMap(
+      nextState,
+      directions,
+    );
 
-test('must return a new map if direction changes', () => {
-  const state = getContentState([ltr, empty]);
-  const directions = EditorBidiService.getDirectionMap(state);
-  const nextState = getContentState([ltr, rtl]);
-  const nextDirections = EditorBidiService.getDirectionMap(
-    nextState,
-    directions,
-  );
+    expect(state).not.toBe(nextState);
+    expect(directions).toBe(nextDirections);
+  });
 
-  expect(state !== nextState).toMatchSnapshot();
-  expect(directions !== nextDirections.toJS()).toMatchSnapshot();
+  it('must return the same map if no directions change', () => {
+    var state = getContentState([ltr]);
+    var directions = EditorBidiService.getDirectionMap(state);
 
-  expect(directions.toJS()).toMatchSnapshot();
-  expect(nextDirections.toJS()).toMatchSnapshot();
+    var newLTR = new ContentBlock({
+      key: 'a',
+      text: 'asdf',
+    });
+    expect(newLTR).not.toBe(ltr);
+
+    var nextState = getContentState([newLTR]);
+    var nextDirections = EditorBidiService.getDirectionMap(
+      nextState,
+      directions,
+    );
+
+    expect(state).not.toBe(nextState);
+    expect(directions).toBe(nextDirections);
+  });
+
+  it('must return a new map if block keys change', () => {
+    var state = getContentState([ltr]);
+    var directions = EditorBidiService.getDirectionMap(state);
+
+    var newLTR = new ContentBlock({
+      key: 'asdf',
+      text: 'asdf',
+    });
+
+    var nextState = getContentState([newLTR]);
+    var nextDirections = EditorBidiService.getDirectionMap(
+      nextState,
+      directions,
+    );
+
+    expect(state).not.toBe(nextState);
+    expect(directions).not.toBe(nextDirections);
+
+    expect(
+      nextDirections.keySeq().toArray(),
+    ).toEqual(
+      ['asdf'],
+    );
+    expect(
+      nextDirections.valueSeq().toArray(),
+    ).toEqual(
+      [LTR],
+    );
+  });
+
+  it('must return a new map if direction changes', () => {
+    var state = getContentState([ltr, empty]);
+    var directions = EditorBidiService.getDirectionMap(state);
+
+    expect(
+      directions.valueSeq().toArray(),
+    ).toEqual(
+      [LTR, LTR],
+    );
+
+    var nextState = getContentState([ltr, rtl]);
+    var nextDirections = EditorBidiService.getDirectionMap(
+      nextState,
+      directions,
+    );
+
+    expect(state).not.toBe(nextState);
+    expect(directions).not.toBe(nextDirections);
+    expect(
+      nextDirections.valueSeq().toArray(),
+    ).toEqual(
+      [LTR, RTL],
+    );
+  });
 });

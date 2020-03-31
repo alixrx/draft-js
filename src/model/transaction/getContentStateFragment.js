@@ -1,12 +1,14 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule getContentStateFragment
+ * @typechecks
+ * @flow
  */
 
 'use strict';
@@ -15,60 +17,65 @@ import type {BlockMap} from 'BlockMap';
 import type ContentState from 'ContentState';
 import type SelectionState from 'SelectionState';
 
-const randomizeBlockMapKeys = require('randomizeBlockMapKeys');
-const removeEntitiesAtEdges = require('removeEntitiesAtEdges');
+var generateRandomKey = require('generateRandomKey');
+var removeEntitiesAtEdges = require('removeEntitiesAtEdges');
 
-const getContentStateFragment = (
+function getContentStateFragment(
   contentState: ContentState,
   selectionState: SelectionState,
-): BlockMap => {
-  const startKey = selectionState.getStartKey();
-  const startOffset = selectionState.getStartOffset();
-  const endKey = selectionState.getEndKey();
-  const endOffset = selectionState.getEndOffset();
+): BlockMap {
+  var startKey = selectionState.getStartKey();
+  var startOffset = selectionState.getStartOffset();
+  var endKey = selectionState.getEndKey();
+  var endOffset = selectionState.getEndOffset();
 
   // Edge entities should be stripped to ensure that we don't preserve
   // invalid partial entities when the fragment is reused. We do, however,
   // preserve entities that are entirely within the selection range.
-  const contentWithoutEdgeEntities = removeEntitiesAtEdges(
+  var contentWithoutEdgeEntities = removeEntitiesAtEdges(
     contentState,
     selectionState,
   );
 
-  const blockMap = contentWithoutEdgeEntities.getBlockMap();
-  const blockKeys = blockMap.keySeq();
-  const startIndex = blockKeys.indexOf(startKey);
-  const endIndex = blockKeys.indexOf(endKey) + 1;
+  var blockMap = contentWithoutEdgeEntities.getBlockMap();
+  var blockKeys = blockMap.keySeq();
+  var startIndex = blockKeys.indexOf(startKey);
+  var endIndex = blockKeys.indexOf(endKey) + 1;
 
-  return randomizeBlockMapKeys(
-    blockMap.slice(startIndex, endIndex).map((block, blockKey) => {
-      const text = block.getText();
-      const chars = block.getCharacterList();
+  var slice = blockMap.slice(startIndex, endIndex).map((block, blockKey) => {
+    var newKey = generateRandomKey();
 
-      if (startKey === endKey) {
-        return block.merge({
-          text: text.slice(startOffset, endOffset),
-          characterList: chars.slice(startOffset, endOffset),
-        });
-      }
+    var text = block.getText();
+    var chars = block.getCharacterList();
 
-      if (blockKey === startKey) {
-        return block.merge({
-          text: text.slice(startOffset),
-          characterList: chars.slice(startOffset),
-        });
-      }
+    if (startKey === endKey) {
+      return block.merge({
+        key: newKey,
+        text: text.slice(startOffset, endOffset),
+        characterList: chars.slice(startOffset, endOffset),
+      });
+    }
 
-      if (blockKey === endKey) {
-        return block.merge({
-          text: text.slice(0, endOffset),
-          characterList: chars.slice(0, endOffset),
-        });
-      }
+    if (blockKey === startKey) {
+      return block.merge({
+        key: newKey,
+        text: text.slice(startOffset),
+        characterList: chars.slice(startOffset),
+      });
+    }
 
-      return block;
-    }),
-  );
-};
+    if (blockKey === endKey) {
+      return block.merge({
+        key: newKey,
+        text: text.slice(0, endOffset),
+        characterList: chars.slice(0, endOffset),
+      });
+    }
+
+    return block.set('key', newKey);
+  });
+
+  return slice.toOrderedMap();
+}
 
 module.exports = getContentStateFragment;

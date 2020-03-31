@@ -1,48 +1,43 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule editOnSelect
+ * @flow
  */
 
 'use strict';
 
 import type DraftEditor from 'DraftEditor.react';
 
-const DraftJsDebugLogging = require('DraftJsDebugLogging');
-const EditorState = require('EditorState');
+var EditorState = require('EditorState');
+var ReactDOM = require('ReactDOM');
 
-const getContentEditableContainer = require('getContentEditableContainer');
-const getDraftEditorSelection = require('getDraftEditorSelection');
+var getDraftEditorSelection = require('getDraftEditorSelection');
+const invariant = require('invariant');
 
 function editOnSelect(editor: DraftEditor): void {
-  if (
-    editor._blockSelectEvents ||
-    editor._latestEditorState !== editor.props.editorState
-  ) {
-    if (editor._blockSelectEvents) {
-      const editorState = editor.props.editorState;
-      const selectionState = editorState.getSelection();
-      DraftJsDebugLogging.logBlockedSelectionEvent({
-        // For now I don't think we need any other info
-        anonymizedDom: 'N/A',
-        extraParams: JSON.stringify({stacktrace: new Error().stack}),
-        selectionState: JSON.stringify(selectionState.toJS()),
-      });
-    }
+  if (editor._blockSelectEvents ||
+      editor._latestEditorState !== editor.props.editorState) {
     return;
   }
 
-  let editorState = editor.props.editorState;
-  const documentSelection = getDraftEditorSelection(
-    editorState,
-    getContentEditableContainer(editor),
+  var editorState = editor.props.editorState;
+  const editorNode = ReactDOM.findDOMNode(editor.refs.editorContainer);
+  invariant(editorNode, 'Missing editorNode');
+  invariant(
+    editorNode.firstChild instanceof HTMLElement,
+    'editorNode.firstChild is not an HTMLElement',
   );
-  const updatedSelectionState = documentSelection.selectionState;
+  var documentSelection = getDraftEditorSelection(
+    editorState,
+    editorNode.firstChild,
+  );
+  var updatedSelectionState = documentSelection.selectionState;
 
   if (updatedSelectionState !== editorState.getSelection()) {
     if (documentSelection.needsRecovery) {

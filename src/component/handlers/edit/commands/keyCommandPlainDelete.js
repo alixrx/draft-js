@@ -1,21 +1,22 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule keyCommandPlainDelete
+ * @flow
  */
 
 'use strict';
 
-const EditorState = require('EditorState');
-const UnicodeUtils = require('UnicodeUtils');
+var EditorState = require('EditorState');
+var UnicodeUtils = require('UnicodeUtils');
 
-const moveSelectionForward = require('moveSelectionForward');
-const removeTextWithStrategy = require('removeTextWithStrategy');
+var moveSelectionForward = require('moveSelectionForward');
+var removeTextWithStrategy = require('removeTextWithStrategy');
 
 /**
  * Remove the selected range. If the cursor is collapsed, remove the following
@@ -23,14 +24,14 @@ const removeTextWithStrategy = require('removeTextWithStrategy');
  * will remove a surrogate pair properly as well.
  */
 function keyCommandPlainDelete(editorState: EditorState): EditorState {
-  const afterRemoval = removeTextWithStrategy(
+  var afterRemoval = removeTextWithStrategy(
     editorState,
     strategyState => {
-      const selection = strategyState.getSelection();
-      const content = strategyState.getCurrentContent();
-      const key = selection.getAnchorKey();
-      const offset = selection.getAnchorOffset();
-      const charAhead = content.getBlockForKey(key).getText()[offset];
+      var selection = strategyState.getSelection();
+      var content = strategyState.getCurrentContent();
+      var key = selection.getAnchorKey();
+      var offset = selection.getAnchorOffset();
+      var charAhead = content.getBlockForKey(key).getText()[offset];
       return moveSelectionForward(
         strategyState,
         charAhead ? UnicodeUtils.getUTF16Length(charAhead, 0) : 1,
@@ -43,7 +44,7 @@ function keyCommandPlainDelete(editorState: EditorState): EditorState {
     return editorState;
   }
 
-  const selection = editorState.getSelection();
+  var selection = editorState.getSelection();
 
   return EditorState.push(
     editorState,

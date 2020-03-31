@@ -1,21 +1,22 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule DraftOffsetKey
+ * @flow
  */
 
 'use strict';
 
 import type {DraftOffsetKeyPath} from 'DraftOffsetKeyPath';
 
-const KEY_DELIMITER = '-';
+var KEY_DELIMITER = '-';
 
-const DraftOffsetKey = {
+var DraftOffsetKey = {
   encode: function(
     blockKey: string,
     decoratorKey: number,
@@ -25,14 +26,9 @@ const DraftOffsetKey = {
   },
 
   decode: function(offsetKey: string): DraftOffsetKeyPath {
-    // Extracts the last two parts of offsetKey and captures the rest in blockKeyParts
-    const [leafKey, decoratorKey, ...blockKeyParts] = offsetKey
-      .split(KEY_DELIMITER)
-      .reverse();
-
+    var [blockKey, decoratorKey, leafKey] = offsetKey.split(KEY_DELIMITER);
     return {
-      // Recomposes the parts of blockKey after reversing them
-      blockKey: blockKeyParts.reverse().join(KEY_DELIMITER),
+      blockKey,
       decoratorKey: parseInt(decoratorKey, 10),
       leafKey: parseInt(leafKey, 10),
     };

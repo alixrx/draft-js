@@ -1,34 +1,29 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule DefaultDraftBlockRenderMap
+ * @flow
  */
 
 'use strict';
 
-import type {DraftBlockRenderConfig} from 'DraftBlockRenderConfig';
-import type {CoreDraftBlockType} from 'DraftBlockType';
+import type {DraftBlockRenderMap} from 'DraftBlockRenderMap';
 
+const {Map} = require('immutable');
 const React = require('React');
 
 const cx = require('cx');
-const {Map} = require('immutable');
-
-type DefaultCoreDraftBlockRenderMap = Map<
-  CoreDraftBlockType,
-  DraftBlockRenderConfig,
->;
 
 const UL_WRAP = <ul className={cx('public/DraftStyleDefault/ul')} />;
 const OL_WRAP = <ol className={cx('public/DraftStyleDefault/ol')} />;
 const PRE_WRAP = <pre className={cx('public/DraftStyleDefault/pre')} />;
 
-const DefaultDraftBlockRenderMap: DefaultCoreDraftBlockRenderMap = Map({
+const DefaultDraftBlockRenderMap: DraftBlockRenderMap = Map({
   'header-one': {
     element: 'h1',
   },
@@ -47,12 +42,6 @@ const DefaultDraftBlockRenderMap: DefaultCoreDraftBlockRenderMap = Map({
   'header-six': {
     element: 'h6',
   },
-  section: {
-    element: 'section',
-  },
-  article: {
-    element: 'article',
-  },
   'unordered-list-item': {
     element: 'li',
     wrapper: UL_WRAP,
@@ -61,17 +50,17 @@ const DefaultDraftBlockRenderMap: DefaultCoreDraftBlockRenderMap = Map({
     element: 'li',
     wrapper: OL_WRAP,
   },
-  blockquote: {
+  'blockquote': {
     element: 'blockquote',
   },
-  atomic: {
+  'atomic': {
     element: 'figure',
   },
   'code-block': {
     element: 'pre',
     wrapper: PRE_WRAP,
   },
-  unstyled: {
+  'unstyled': {
     element: 'div',
     aliasedElements: ['p'],
   },

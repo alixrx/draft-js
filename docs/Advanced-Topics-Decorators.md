@@ -1,6 +1,10 @@
 ---
 id: advanced-topics-decorators
 title: Decorators
+layout: docs
+category: Advanced Topics
+next: advanced-topics-key-bindings
+permalink: docs/advanced-topics-decorators.html
 ---
 
 Inline and block styles aren't the only kind of rich styling that we might
@@ -14,7 +18,7 @@ offers a live example of decorators in action.
 ## CompositeDecorator
 
 The decorator concept is based on scanning the contents of a given
-[ContentBlock](/docs/api-reference-content-block)
+[ContentBlock](/docs/api-reference-content-block.html)
 for ranges of text that match a defined strategy, then rendering them
 with a specified React component.
 
@@ -84,35 +88,22 @@ The strategy functions execute the provided callback with the `start` and
 ## Decorator Components
 
 For your decorated ranges of text, you must define a React component to use
-to render them. These tend to be plain `span` elements with CSS classes or
+to render them. These tend to be simple `span` elements with CSS classes or
 styles applied to them.
 
 In our current example, the `CompositeDecorator` object names `HandleSpan` and
-`HashtagSpan` as the components to use for decoration. These are basic
+`HashtagSpan` as the components to use for decoration. These are just basic
 stateless components:
 
 ```js
-const HandleSpan = props => {
-  return (
-    <span {...props} style={styles.handle}>
-      {props.children}
-    </span>
-  );
+const HandleSpan = (props) => {
+  return <span {...props} style={styles.handle}>{props.children}</span>;
 };
 
-const HashtagSpan = props => {
-  return (
-    <span {...props} style={styles.hashtag}>
-      {props.children}
-    </span>
-  );
+const HashtagSpan = (props) => {
+  return <span {...props} style={styles.hashtag}>{props.children}</span>;
 };
 ```
-
-The Decorator Component will receive various pieces of metadata in `props`,
-including a copy of the `contentState`, the `entityKey` if there is one, and the
-`blockKey`. For a full list of props supplied to a Decorator Component see the
-[DraftDecoratorComponentProps type](https://github.com/facebook/draft-js/blob/master/src/model/decorators/DraftDecorator.js).
 
 Note that `props.children` is passed through to the rendered output. This is
 done to ensure that the text is rendered within the decorated `span`.
@@ -132,7 +123,7 @@ you wish, as long as they match the expected type -- you are not bound by
 ## Setting new decorators
 
 Further, it is acceptable to set a new `decorator` value on the `EditorState`
-on the fly, during normal state propagation, through immutable means.
+on the fly, during normal state propagation -- through immutable means, of course.
 
 This means that during your app workflow, if your decorator becomes invalid or
 requires a modification, you can create a new decorator object (or use
@@ -145,12 +136,10 @@ following:
 
 ```js
 function turnOffHandleDecorations(editorState) {
-  const onlyHashtags = new CompositeDecorator([
-    {
-      strategy: hashtagStrategy,
-      component: HashtagSpan,
-    },
-  ]);
+  const onlyHashtags = new CompositeDecorator([{
+    strategy: hashtagStrategy,
+    component: HashtagSpan,
+  }]);
   return EditorState.set(editorState, {decorator: onlyHashtags});
 }
 ```

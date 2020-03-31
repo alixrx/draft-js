@@ -1,20 +1,22 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule getRangesForDraftEntity
+ * @typechecks
+ * @flow
  */
 
 'use strict';
 
-import type {BlockNodeRecord} from 'BlockNodeRecord';
+import type ContentBlock from 'ContentBlock';
 import type {DraftRange} from 'DraftRange';
 
-const invariant = require('invariant');
+var invariant = require('invariant');
 
 /**
  * Obtain the start and end positions of the range that has the
@@ -25,10 +27,10 @@ const invariant = require('invariant');
  * the subsequent range.
  */
 function getRangesForDraftEntity(
-  block: BlockNodeRecord,
+  block: ContentBlock,
   key: string,
 ): Array<DraftRange> {
-  const ranges = [];
+  var ranges = [];
   block.findEntityRanges(
     c => c.getEntity() === key,
     (start, end) => {
@@ -36,7 +38,10 @@ function getRangesForDraftEntity(
     },
   );
 
-  invariant(!!ranges.length, 'Entity key not found in this range.');
+  invariant(
+    !!ranges.length,
+    'Entity key not found in this range.',
+  );
 
   return ranges;
 }

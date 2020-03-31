@@ -1,6 +1,10 @@
 ---
 id: advanced-topics-issues-and-pitfalls
 title: Issues and Pitfalls
+layout: docs
+category: Advanced Topics
+next: api-reference-editor
+permalink: docs/advanced-topics-issues-and-pitfalls.html
 ---
 
 This article addresses some known issues with the Draft editor framework, as
@@ -28,16 +32,16 @@ you must always allow your `EditorState` to propagate to your `Editor`
 component without delay, and independently perform batched updates that do
 not affect the state of your `Editor` component.
 
-### Missing `Draft.css`
+### Missing Draft.css
 
 The Draft framework includes a handful of CSS resources intended for use with
-the editor, available in a single file via the build, `Draft.css`.
+the editor, available in a single file via the build, Draft.css.
 
 This CSS should be included when rendering the editor, as these styles set defaults
 for text alignment, spacing, and other important features. Without it, you may
 encounter issues with block positioning, alignment, and cursor behavior.
 
-If you choose to write your own CSS independent of `Draft.css`, you will most
+If you choose to write your own CSS independent of Draft.css, you will most
 likely need to replicate much of the default styling.
 
 ## Known Issues
@@ -71,6 +75,12 @@ interaction.
 As of IE11, Internet Explorer demonstrates notable issues with certain international
 input methods, most significantly Korean input.
 
+### Mobile Support
+
+At this time Draft does not fully support mobile browsers. There are some known
+issues with certain Android keyboards and with international input methods. Full
+mobile support is a goal that the framework is moving towards for the future.
+
 ### Polyfills
 
 Some of Draft's code and that of its dependencies make use of ES2015 language
@@ -83,15 +93,15 @@ many examples but you are free to use
 [babel-polyfill](https://babeljs.io/docs/usage/polyfill/) if that's more
 your scene.
 
-When using either polyfill/shim, you should include it as early as possible in
+When using either polyfill/shim, you should include it as early as possibly in
 your application's entrypoint (at the very minimum, before you import Draft).
 For instance, using
 [create-react-app](https://github.com/facebookincubator/create-react-app) and
-targeting IE11, `src/index.js` is probably a good spot to import your polyfill:
+targeting ie11, `src/index.js` is probably a good spot to import your polyfill:
 
-**`src/index.js`**
+**src/index.js**
 
-```js
+```
 import 'babel-polyfill';
 // or
 import 'es6-shim';
@@ -101,7 +111,10 @@ import ReactDOM from 'react-dom';
 import App from './App';
 import './index.css';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(
+  <App />,
+  document.getElementById('root')
+);
 ```
 
 ### Mobile Not Yet Supported

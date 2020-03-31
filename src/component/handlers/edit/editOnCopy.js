@@ -1,19 +1,20 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule editOnCopy
+ * @flow
  */
 
 'use strict';
 
 import type DraftEditor from 'DraftEditor.react';
 
-const getFragmentFromSelection = require('getFragmentFromSelection');
+var getFragmentFromSelection = require('getFragmentFromSelection');
 
 /**
  * If we have a selection, create a ContentState fragment and store
@@ -21,8 +22,8 @@ const getFragmentFromSelection = require('getFragmentFromSelection');
  * fragment if no external clipboard data is supplied.
  */
 function editOnCopy(editor: DraftEditor, e: SyntheticClipboardEvent<>): void {
-  const editorState = editor._latestEditorState;
-  const selection = editorState.getSelection();
+  var editorState = editor._latestEditorState;
+  var selection = editorState.getSelection();
 
   // No selection, so there's nothing to copy.
   if (selection.isCollapsed()) {

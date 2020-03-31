@@ -1,25 +1,27 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
+ * @providesModule getCharacterRemovalRange
+ * @typechecks
  * @flow
- * @emails oncall+draft_js
  */
 
 'use strict';
 
-import type {BlockNodeRecord} from 'BlockNodeRecord';
+import type ContentBlock from 'ContentBlock';
 import type {DraftRemovalDirection} from 'DraftRemovalDirection';
 import type {EntityMap} from 'EntityMap';
 import type SelectionState from 'SelectionState';
 
-const DraftEntitySegments = require('DraftEntitySegments');
+var DraftEntitySegments = require('DraftEntitySegments');
 
-const getRangesForDraftEntity = require('getRangesForDraftEntity');
-const invariant = require('invariant');
+var getRangesForDraftEntity = require('getRangesForDraftEntity');
+var invariant = require('invariant');
 
 /**
  * Given a SelectionState and a removal direction, determine the entire range
@@ -32,20 +34,20 @@ const invariant = require('invariant');
  */
 function getCharacterRemovalRange(
   entityMap: EntityMap,
-  startBlock: BlockNodeRecord,
-  endBlock: BlockNodeRecord,
+  startBlock: ContentBlock,
+  endBlock: ContentBlock,
   selectionState: SelectionState,
   direction: DraftRemovalDirection,
 ): SelectionState {
-  const start = selectionState.getStartOffset();
-  const end = selectionState.getEndOffset();
-  const startEntityKey = startBlock.getEntityAt(start);
-  const endEntityKey = endBlock.getEntityAt(end - 1);
+  var start = selectionState.getStartOffset();
+  var end = selectionState.getEndOffset();
+  var startEntityKey = startBlock.getEntityAt(start);
+  var endEntityKey = endBlock.getEntityAt(end - 1);
   if (!startEntityKey && !endEntityKey) {
     return selectionState;
   }
-  let newSelectionState = selectionState;
-  if (startEntityKey && startEntityKey === endEntityKey) {
+  var newSelectionState = selectionState;
+  if (startEntityKey && (startEntityKey === endEntityKey)) {
     newSelectionState = getEntityRemovalRange(
       entityMap,
       startBlock,
@@ -113,17 +115,17 @@ function getCharacterRemovalRange(
 
 function getEntityRemovalRange(
   entityMap: EntityMap,
-  block: BlockNodeRecord,
+  block: ContentBlock,
   selectionState: SelectionState,
   direction: DraftRemovalDirection,
   entityKey: string,
   isEntireSelectionWithinEntity: boolean,
   isEntityAtStart: boolean,
 ): SelectionState {
-  let start = selectionState.getStartOffset();
-  let end = selectionState.getEndOffset();
-  const entity = entityMap.__get(entityKey);
-  const mutability = entity.getMutability();
+  var start = selectionState.getStartOffset();
+  var end = selectionState.getEndOffset();
+  var entity = entityMap.__get(entityKey);
+  var mutability = entity.getMutability();
   const sideToConsider = isEntityAtStart ? start : end;
 
   // `MUTABLE` entities can just have the specified range of text removed
@@ -133,8 +135,8 @@ function getEntityRemovalRange(
   }
 
   // Find the entity range that overlaps with our removal range.
-  const entityRanges = getRangesForDraftEntity(block, entityKey).filter(
-    range => sideToConsider <= range.end && sideToConsider >= range.start,
+  var entityRanges = getRangesForDraftEntity(block, entityKey).filter(
+    (range) => sideToConsider <= range.end && sideToConsider >= range.start,
   );
 
   invariant(
@@ -142,7 +144,7 @@ function getEntityRemovalRange(
     'There should only be one entity range within this removal range.',
   );
 
-  const entityRange = entityRanges[0];
+  var entityRange = entityRanges[0];
 
   // For `IMMUTABLE` entity types, we will remove the entire entity range.
   if (mutability === 'IMMUTABLE') {
@@ -163,7 +165,7 @@ function getEntityRemovalRange(
     }
   }
 
-  const removalRange = DraftEntitySegments.getRemovalRange(
+  var removalRange = DraftEntitySegments.getRemovalRange(
     start,
     end,
     block.getText().slice(entityRange.start, entityRange.end),

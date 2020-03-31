@@ -1,35 +1,25 @@
 ---
 id: api-reference-content-block
 title: ContentBlock
+layout: docs
+category: API Reference
+next: api-reference-character-metadata
+permalink: docs/api-reference-content-block.html
 ---
 
 `ContentBlock` is an Immutable
 [Record](http://facebook.github.io/immutable-js/docs/#/Record/Record) that
 represents the full state of a single block of editor content, including:
 
-- Plain text contents of the block
-- Type, e.g. paragraph, header, list item
-- Entity, inline style, and depth information
+  - Plain text contents of the block
+  - Type, e.g. paragraph, header, list item
+  - Entity, inline style, and depth information
 
 A `ContentState` object contains an `OrderedMap` of these `ContentBlock` objects,
 which together comprise the full contents of the editor.
 
 `ContentBlock` objects are largely analogous to block-level HTML elements like
-paragraphs and list items. The available types are:
-
-- unstyled
-- paragraph
-- header-one
-- header-two
-- header-three
-- header-four
-- header-five
-- header-six
-- unordered-list-item
-- ordered-list-item
-- blockquote
-- code-block
-- atomic
+paragraphs and list items.
 
 New `ContentBlock` objects may be created directly using the constructor.
 Expected Record values are detailed below.
@@ -48,13 +38,9 @@ By encoding inline styles and entities together in this way, a function that
 performs edits on a `ContentBlock` can perform slices, concats, and other List
 methods on a single `List` object.
 
-When creating a new `ContentBlock` containing `text` and without `characterList`
-it then will default to a `characterList` with empty `CharacterMetadata` for the
-supplied text.
-
 ## Overview
 
-_Methods_
+*Methods*
 
 <ul class="apiIndex">
   <li>
@@ -74,7 +60,7 @@ _Methods_
   </li>
   <li>
     <a href="#getcharacterlist">
-      <pre>getCharacterList(): List&lt;CharacterMetadata&gt;</pre>
+      <pre>getCharacterList(): List<CharacterMetadata></pre>
     </a>
   </li>
   <li>
@@ -99,7 +85,7 @@ _Methods_
   </li>
   <li>
     <a href="#getdata">
-      <pre>getData(): Map&lt;any, any&gt;</pre>
+      <pre>getData(): Map<any, any></pre>
     </a>
   </li>
   <li>
@@ -114,7 +100,7 @@ _Methods_
   </li>
 </ul>
 
-_Properties_
+*Properties*
 
 > Note
 >
@@ -139,7 +125,7 @@ _Properties_
   </li>
   <li>
     <a href="#characterlist">
-      <pre>characterList: List&lt;CharacterMetadata&gt;</pre>
+      <pre>characterList: List<CharacterMetadata></pre>
     </a>
   </li>
   <li>
@@ -149,112 +135,110 @@ _Properties_
   </li>
   <li>
     <a href="#data">
-      <pre>data: Map&lt;any, any&gt;</pre>
+      <pre>data: Map<any, any></pre>
     </a>
   </li>
 </ul>
 
 ## Methods
 
-### `getKey()`
+### getKey()
 
-```js
+```
 getKey(): string
 ```
+Returns the string key for this `ContentBlock`.
 
-Returns the string key for this `ContentBlock`. Block keys are alphanumeric string. It is recommended to use `generateRandomKey` to generate block keys.
+### getType()
 
-### `getType()`
-
-```js
+```
 getType(): DraftBlockType
 ```
-
 Returns the type for this `ContentBlock`. Type values are largely analogous to
 block-level HTML elements.
 
-### `getText()`
+### getText()
 
-```js
+```
 getText(): string
 ```
-
 Returns the full plaintext for this `ContentBlock`. This value does not contain
 any styling, decoration, or HTML information.
 
-### `getCharacterList()`
+### getCharacterList()
 
-```js
+```
 getCharacterList(): List<CharacterMetadata>
 ```
-
-Returns an immutable `List` of `CharacterMetadata` objects, one for each character in the `ContentBlock`. (See [CharacterMetadata](/docs/api-reference-character-metadata) for details.)
+Returns an immutable `List` of `CharacterMetadata` objects, one for each
+character in the `ContentBlock`. (See [CharacterMetadata](/docs/api-reference-character-metadata.html)
+for details.)
 
 This `List` contains all styling and entity information for the block.
 
-### `getLength()`
+### getLength()
 
-```js
+```
 getLength(): number
 ```
-
 Returns the length of the plaintext for the `ContentBlock`.
 
-This value uses the standard JavaScript `length` property for the string, and is therefore not Unicode-aware -- surrogate pairs will be counted as two characters.
+This value uses the standard JavaScript `length` property for the string, and
+is therefore not Unicode-aware -- surrogate pairs will be counted as two
+characters.
 
-### `getDepth()`
+### getDepth()
 
-```js
+```
 getDepth(): number
 ```
+Returns the depth value for this block, if any. This is currently used only
+for list items.
 
-Returns the depth value for this block, if any. This is currently used only for list items.
+### getInlineStyleAt()
 
-### `getInlineStyleAt()`
-
-```js
+```
 getInlineStyleAt(offset: number): DraftInlineStyle
 ```
+Returns the `DraftInlineStyle` value (an `OrderedSet<string>`) at a given offset
+within this `ContentBlock`.
 
-Returns the `DraftInlineStyle` value (an `OrderedSet<string>`) at a given offset within this `ContentBlock`.
+### getEntityAt()
 
-### `getEntityAt()`
-
-```js
+```
 getEntityAt(offset: number): ?string
 ```
+Returns the entity key value (or `null` if none) at a given offset within this
+`ContentBlock`.
 
-Returns the entity key value (or `null` if none) at a given offset within this `ContentBlock`.
+### getData()
 
-### `getData()`
-
-```js
+```
 getData(): Map<any, any>
 ```
-
 Returns block-level metadata.
 
-### `findStyleRanges()`
+### findStyleRanges()
 
-```js
+```
 findStyleRanges(
   filterFn: (value: CharacterMetadata) => boolean,
   callback: (start: number, end: number) => void
 ): void
 ```
+Executes a callback for each contiguous range of styles within this
+`ContentBlock`.
 
-Executes a callback for each contiguous range of styles within this `ContentBlock`.
+### findEntityRanges()
 
-### `findEntityRanges()`
-
-```js
+```
 findEntityRanges(
   filterFn: (value: CharacterMetadata) => boolean,
   callback: (start: number, end: number) => void
 ): void
 ```
-
-Executes a callback for each contiguous range of entities within this `ContentBlock`.
+Executes a callback for each contiguous range of entities within this
+`ContentBlock`.
 
 ## Properties
 
@@ -263,26 +247,20 @@ Executes a callback for each contiguous range of entities within this `ContentBl
 > Use [Immutable Map API](http://facebook.github.io/immutable-js/docs/#/Map)
 > for the `ContentBlock` constructor or to set properties.
 
-### `key`
-
+### key
 See `getKey()`.
 
-### `text`
-
+### text
 See `getText()`.
 
-### `type`
-
+### type
 See `getType()`.
 
-### `characterList`
-
+### characterList
 See `getCharacterList()`.
 
-### `depth`
-
+### depth
 See `getDepth()`.
 
-### `data`
-
+### data
 See `getData()`.

@@ -1,6 +1,10 @@
 ---
 id: advanced-topics-text-direction
 title: Text Direction
+layout: docs
+category: Advanced Topics
+next: advanced-topics-editorstate-race-conditions
+permalink: docs/advanced-topics-text-direction.html
 ---
 
 Facebook supports dozens of languages, which means that our text inputs need
@@ -26,6 +30,6 @@ This may be useful, for instance, if an editor requires strictly centered
 contents, or needs to keep text aligned flush against another UI element.
 
 The `Editor` component therefore provides a `textAlignment` prop, with a
-small set of values: `'left'`, `'center'`, and `'right'`. Using these values,
+simple set of values: `'left'`, `'center'`, and `'right'`. Using these values,
 the contents of your editor will be aligned to the specified direction regardless
 of language and character set.

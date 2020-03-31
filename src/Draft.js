@@ -1,10 +1,12 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
+ * @providesModule Draft
  * @flow
  */
 
@@ -25,17 +27,16 @@ const DraftModifier = require('DraftModifier');
 const DraftEntityInstance = require('DraftEntityInstance');
 const EditorState = require('EditorState');
 const KeyBindingUtil = require('KeyBindingUtil');
-const RawDraftContentState = require('RawDraftContentState');
 const RichTextEditorUtil = require('RichTextEditorUtil');
 const SelectionState = require('SelectionState');
 
 const convertFromDraftStateToRaw = require('convertFromDraftStateToRaw');
+const convertFromHTMLToContentBlocks =
+  require('convertFromHTMLToContentBlocks');
 const convertFromRawToDraftState = require('convertFromRawToDraftState');
 const generateRandomKey = require('generateRandomKey');
 const getDefaultKeyBinding = require('getDefaultKeyBinding');
 const getVisibleSelectionRect = require('getVisibleSelectionRect');
-
-const convertFromHTML = require('convertFromHTMLToContentBlocks');
 
 const DraftPublic = {
   Editor: DraftEditor,
@@ -50,7 +51,6 @@ const DraftPublic = {
   CharacterMetadata,
   ContentBlock,
   ContentState,
-  RawDraftContentState,
   SelectionState,
 
   AtomicBlockUtils,
@@ -61,7 +61,7 @@ const DraftPublic = {
   DefaultDraftBlockRenderMap,
   DefaultDraftInlineStyle,
 
-  convertFromHTML,
+  convertFromHTML: convertFromHTMLToContentBlocks,
   convertFromRaw: convertFromRawToDraftState,
   convertToRaw: convertFromDraftStateToRaw,
   genKey: generateRandomKey,

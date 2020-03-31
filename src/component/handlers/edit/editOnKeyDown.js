@@ -1,12 +1,13 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule editOnKeyDown
+ * @flow
  */
 
 'use strict';
@@ -14,27 +15,27 @@
 import type DraftEditor from 'DraftEditor.react';
 import type {DraftEditorCommand} from 'DraftEditorCommand';
 
-const DraftModifier = require('DraftModifier');
-const EditorState = require('EditorState');
-const KeyBindingUtil = require('KeyBindingUtil');
-const Keys = require('Keys');
-const SecondaryClipboard = require('SecondaryClipboard');
-const UserAgent = require('UserAgent');
+var DraftModifier = require('DraftModifier');
+var EditorState = require('EditorState');
+var KeyBindingUtil = require('KeyBindingUtil');
+var Keys = require('Keys');
+var SecondaryClipboard = require('SecondaryClipboard');
+var UserAgent = require('UserAgent');
 
 const isEventHandled = require('isEventHandled');
-const keyCommandBackspaceToStartOfLine = require('keyCommandBackspaceToStartOfLine');
-const keyCommandBackspaceWord = require('keyCommandBackspaceWord');
-const keyCommandDeleteWord = require('keyCommandDeleteWord');
-const keyCommandInsertNewline = require('keyCommandInsertNewline');
-const keyCommandMoveSelectionToEndOfBlock = require('keyCommandMoveSelectionToEndOfBlock');
-const keyCommandMoveSelectionToStartOfBlock = require('keyCommandMoveSelectionToStartOfBlock');
-const keyCommandPlainBackspace = require('keyCommandPlainBackspace');
-const keyCommandPlainDelete = require('keyCommandPlainDelete');
-const keyCommandTransposeCharacters = require('keyCommandTransposeCharacters');
-const keyCommandUndo = require('keyCommandUndo');
+var keyCommandBackspaceToStartOfLine = require('keyCommandBackspaceToStartOfLine');
+var keyCommandBackspaceWord = require('keyCommandBackspaceWord');
+var keyCommandDeleteWord = require('keyCommandDeleteWord');
+var keyCommandInsertNewline = require('keyCommandInsertNewline');
+var keyCommandMoveSelectionToEndOfBlock = require('keyCommandMoveSelectionToEndOfBlock');
+var keyCommandMoveSelectionToStartOfBlock = require('keyCommandMoveSelectionToStartOfBlock');
+var keyCommandPlainBackspace = require('keyCommandPlainBackspace');
+var keyCommandPlainDelete = require('keyCommandPlainDelete');
+var keyCommandTransposeCharacters = require('keyCommandTransposeCharacters');
+var keyCommandUndo = require('keyCommandUndo');
 
-const {isOptionKeyCommand} = KeyBindingUtil;
-const isChrome = UserAgent.isBrowser('Chrome');
+var {isOptionKeyCommand} = KeyBindingUtil;
+var isChrome = UserAgent.isBrowser('Chrome');
 
 /**
  * Map a `DraftEditorCommand` command value to a corresponding function.
@@ -42,7 +43,6 @@ const isChrome = UserAgent.isBrowser('Chrome');
 function onKeyCommand(
   command: DraftEditorCommand | string,
   editorState: EditorState,
-  e: SyntheticKeyboardEvent<HTMLElement>,
 ): EditorState {
   switch (command) {
     case 'redo':
@@ -56,7 +56,7 @@ function onKeyCommand(
     case 'backspace-word':
       return keyCommandBackspaceWord(editorState);
     case 'backspace-to-start-of-line':
-      return keyCommandBackspaceToStartOfLine(editorState, e);
+      return keyCommandBackspaceToStartOfLine(editorState);
     case 'split-block':
       return keyCommandInsertNewline(editorState);
     case 'transpose-characters':
@@ -83,29 +83,10 @@ function onKeyCommand(
  * See `getDefaultKeyBinding` for defaults. Alternatively, the top-level
  * component may provide a custom mapping via the `keyBindingFn` prop.
  */
-function editOnKeyDown(
-  editor: DraftEditor,
-  e: SyntheticKeyboardEvent<HTMLElement>,
-): void {
-  const keyCode = e.which;
-  const editorState = editor._latestEditorState;
-  function callDeprecatedHandler(
-    handlerName:
-      | 'onDownArrow'
-      | 'onEscape'
-      | 'onLeftArrow'
-      | 'onRightArrow'
-      | 'onTab'
-      | 'onUpArrow',
-  ): boolean {
-    const deprecatedHandler = editor.props[handlerName];
-    if (deprecatedHandler) {
-      deprecatedHandler(e);
-      return true;
-    } else {
-      return false;
-    }
-  }
+function editOnKeyDown(editor: DraftEditor, e: SyntheticKeyboardEvent<>): void {
+  var keyCode = e.which;
+  var editorState = editor._latestEditorState;
+
   switch (keyCode) {
     case Keys.RETURN:
       e.preventDefault();
@@ -120,59 +101,48 @@ function editOnKeyDown(
       break;
     case Keys.ESC:
       e.preventDefault();
-      if (callDeprecatedHandler('onEscape')) {
-        return;
-      }
-      break;
+      editor.props.onEscape && editor.props.onEscape(e);
+      return;
     case Keys.TAB:
-      if (callDeprecatedHandler('onTab')) {
-        return;
-      }
-      break;
+      editor.props.onTab && editor.props.onTab(e);
+      return;
     case Keys.UP:
-      if (callDeprecatedHandler('onUpArrow')) {
-        return;
-      }
-      break;
+      editor.props.onUpArrow && editor.props.onUpArrow(e);
+      return;
     case Keys.RIGHT:
-      if (callDeprecatedHandler('onRightArrow')) {
-        return;
-      }
-      break;
+      editor.props.onRightArrow && editor.props.onRightArrow(e);
+      return;
     case Keys.DOWN:
-      if (callDeprecatedHandler('onDownArrow')) {
-        return;
-      }
-      break;
+      editor.props.onDownArrow && editor.props.onDownArrow(e);
+      return;
     case Keys.LEFT:
-      if (callDeprecatedHandler('onLeftArrow')) {
-        return;
-      }
-      break;
+      editor.props.onLeftArrow && editor.props.onLeftArrow(e);
+      return;
     case Keys.SPACE:
-      // Prevent Chrome on OSX behavior where option + space scrolls.
+      // Handling for OSX where option + space scrolls.
       if (isChrome && isOptionKeyCommand(e)) {
         e.preventDefault();
+        // Insert a nbsp into the editor.
+        const contentState = DraftModifier.replaceText(
+          editorState.getCurrentContent(),
+          editorState.getSelection(),
+          '\u00a0',
+        );
+        editor.update(
+          EditorState.push(
+            editorState,
+            contentState,
+            'insert-characters',
+          ),
+        );
+        return;
       }
   }
 
-  const command = editor.props.keyBindingFn(e);
+  var command = editor.props.keyBindingFn(e);
 
   // If no command is specified, allow keydown event to continue.
-  if (command == null || command === '') {
-    if (keyCode === Keys.SPACE && isChrome && isOptionKeyCommand(e)) {
-      // The default keydown event has already been prevented in order to stop
-      // Chrome from scrolling. Insert a nbsp into the editor as OSX would for
-      // other browsers.
-      const contentState = DraftModifier.replaceText(
-        editorState.getCurrentContent(),
-        editorState.getSelection(),
-        '\u00a0',
-      );
-      editor.update(
-        EditorState.push(editorState, contentState, 'insert-characters'),
-      );
-    }
+  if (!command) {
     return;
   }
 
@@ -190,14 +160,12 @@ function editOnKeyDown(
   // Allow components higher up the tree to handle the command first.
   if (
     editor.props.handleKeyCommand &&
-    isEventHandled(
-      editor.props.handleKeyCommand(command, editorState, e.timeStamp),
-    )
+    isEventHandled(editor.props.handleKeyCommand(command, editorState))
   ) {
     return;
   }
 
-  const newState = onKeyCommand(command, editorState, e);
+  var newState = onKeyCommand(command, editorState);
   if (newState !== editorState) {
     editor.update(newState);
   }

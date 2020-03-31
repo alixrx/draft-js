@@ -1,29 +1,26 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
+ * @providesModule setDraftEditorSelection
+ * @typechecks
  * @format
  * @flow
- * @emails oncall+draft_js
  */
 
 'use strict';
 
 import type SelectionState from 'SelectionState';
 
-const DraftEffects = require('DraftEffects');
 const DraftJsDebugLogging = require('DraftJsDebugLogging');
-const UserAgent = require('UserAgent');
 
 const containsNode = require('containsNode');
 const getActiveElement = require('getActiveElement');
-const getCorrectDocumentFromNode = require('getCorrectDocumentFromNode');
 const invariant = require('invariant');
-const isElement = require('isElement');
-
-const isIE = UserAgent.isBrowser('IE');
 
 function getAnonymizedDOM(
   node: Node,
@@ -33,17 +30,16 @@ function getAnonymizedDOM(
     return '[empty]';
   }
 
-  const anonymized = anonymizeTextWithin(node, getNodeLabels);
+  var anonymized = anonymizeTextWithin(node, getNodeLabels);
   if (anonymized.nodeType === Node.TEXT_NODE) {
     return anonymized.textContent;
   }
 
   invariant(
-    isElement(anonymized),
+    anonymized instanceof Element,
     'Node must be an Element if it is not a text node.',
   );
-  const castedElement: Element = (anonymized: any);
-  return castedElement.outerHTML;
+  return anonymized.outerHTML;
 }
 
 function anonymizeTextWithin(
@@ -53,8 +49,8 @@ function anonymizeTextWithin(
   const labels = getNodeLabels !== undefined ? getNodeLabels(node) : [];
 
   if (node.nodeType === Node.TEXT_NODE) {
-    const length = node.textContent.length;
-    return getCorrectDocumentFromNode(node).createTextNode(
+    var length = node.textContent.length;
+    return document.createTextNode(
       '[text ' +
         length +
         (labels.length ? ' | ' + labels.join(', ') : '') +
@@ -62,12 +58,12 @@ function anonymizeTextWithin(
     );
   }
 
-  const clone = node.cloneNode();
+  var clone = node.cloneNode();
   if (clone.nodeType === 1 && labels.length) {
     ((clone: any): Element).setAttribute('data-labels', labels.join(', '));
   }
-  const childNodes = node.childNodes;
-  for (let ii = 0; ii < childNodes.length; ii++) {
+  var childNodes = node.childNodes;
+  for (var ii = 0; ii < childNodes.length; ii++) {
     clone.appendChild(anonymizeTextWithin(childNodes[ii], getNodeLabels));
   }
 
@@ -80,15 +76,15 @@ function getAnonymizedEditorDOM(
 ): string {
   // grabbing the DOM content of the Draft editor
   let currentNode = node;
-  // this should only be used after checking with isElement
-  let castedNode: Element = (currentNode: any);
   while (currentNode) {
-    if (isElement(currentNode) && castedNode.hasAttribute('contenteditable')) {
+    if (
+      currentNode instanceof Element &&
+      currentNode.hasAttribute('contenteditable')
+    ) {
       // found the Draft editor container
       return getAnonymizedDOM(currentNode, getNodeLabels);
     } else {
       currentNode = currentNode.parentNode;
-      castedNode = (currentNode: any);
     }
   }
   return 'Could not find contentEditable parent of node';
@@ -119,22 +115,21 @@ function setDraftEditorSelection(
   // It's possible that the editor has been removed from the DOM but
   // our selection code doesn't know it yet. Forcing selection in
   // this case may lead to errors, so just bail now.
-  const documentObject = getCorrectDocumentFromNode(node);
-  if (!containsNode(documentObject.documentElement, node)) {
+  if (!containsNode(document.documentElement, node)) {
     return;
   }
 
-  const selection = documentObject.defaultView.getSelection();
-  let anchorKey = selectionState.getAnchorKey();
-  let anchorOffset = selectionState.getAnchorOffset();
-  let focusKey = selectionState.getFocusKey();
-  let focusOffset = selectionState.getFocusOffset();
-  let isBackward = selectionState.getIsBackward();
+  var selection = global.getSelection();
+  var anchorKey = selectionState.getAnchorKey();
+  var anchorOffset = selectionState.getAnchorOffset();
+  var focusKey = selectionState.getFocusKey();
+  var focusOffset = selectionState.getFocusOffset();
+  var isBackward = selectionState.getIsBackward();
 
   // IE doesn't support backward selection. Swap key/offset pairs.
   if (!selection.extend && isBackward) {
-    const tempKey = anchorKey;
-    const tempOffset = anchorOffset;
+    var tempKey = anchorKey;
+    var tempOffset = anchorOffset;
     anchorKey = focusKey;
     anchorOffset = focusOffset;
     focusKey = tempKey;
@@ -142,12 +137,12 @@ function setDraftEditorSelection(
     isBackward = false;
   }
 
-  const hasAnchor =
+  var hasAnchor =
     anchorKey === blockKey &&
     nodeStart <= anchorOffset &&
     nodeEnd >= anchorOffset;
 
-  const hasFocus =
+  var hasFocus =
     focusKey === blockKey && nodeStart <= focusOffset && nodeEnd >= focusOffset;
 
   // If the selection is entirely bound within this node, set the selection
@@ -211,8 +206,8 @@ function setDraftEditorSelection(
     // We keep track of it, reset the selection range, and extend it
     // back to the focus point.
     if (hasAnchor) {
-      const storedFocusNode = selection.focusNode;
-      const storedFocusOffset = selection.focusOffset;
+      var storedFocusNode = selection.focusNode;
+      var storedFocusOffset = selection.focusOffset;
 
       selection.removeAllRanges();
       addPointToSelection(
@@ -253,7 +248,7 @@ function addFocusToSelection(
       // the call to 'selection.extend' is about to throw
       DraftJsDebugLogging.logSelectionStateFailure({
         anonymizedDom: getAnonymizedEditorDOM(node),
-        extraParams: JSON.stringify({offset}),
+        extraParams: JSON.stringify({offset: offset}),
         selectionState: JSON.stringify(selectionState.toJS()),
       });
     }
@@ -292,7 +287,7 @@ function addFocusToSelection(
               : null,
             selectionFocusOffset: selection.focusOffset,
             message: e ? '' + e : null,
-            offset,
+            offset: offset,
           },
           null,
           2,
@@ -309,11 +304,9 @@ function addFocusToSelection(
     // Additionally, clone the selection range. IE11 throws an
     // InvalidStateError when attempting to access selection properties
     // after the range is detached.
-    if (selection.rangeCount > 0) {
-      const range = selection.getRangeAt(0);
-      range.setEnd(node, offset);
-      selection.addRange(range.cloneRange());
-    }
+    var range = selection.getRangeAt(0);
+    range.setEnd(node, offset);
+    selection.addRange(range.cloneRange());
   }
 }
 
@@ -323,35 +316,18 @@ function addPointToSelection(
   offset: number,
   selectionState: SelectionState,
 ): void {
-  const range = getCorrectDocumentFromNode(node).createRange();
+  var range = document.createRange();
   // logging to catch bug that is being reported in t16250795
   if (offset > getNodeLength(node)) {
     // in this case we know that the call to 'range.setStart' is about to throw
     DraftJsDebugLogging.logSelectionStateFailure({
       anonymizedDom: getAnonymizedEditorDOM(node),
-      extraParams: JSON.stringify({offset}),
+      extraParams: JSON.stringify({offset: offset}),
       selectionState: JSON.stringify(selectionState.toJS()),
     });
-    DraftEffects.handleExtensionCausedError();
   }
   range.setStart(node, offset);
-
-  // IE sometimes throws Unspecified Error when trying to addRange
-  if (isIE) {
-    try {
-      selection.addRange(range);
-    } catch (e) {
-      if (__DEV__) {
-        /* eslint-disable-next-line no-console */
-        console.warn('Call to selection.addRange() threw exception: ', e);
-      }
-    }
-  } else {
-    selection.addRange(range);
-  }
+  selection.addRange(range);
 }
 
-module.exports = {
-  setDraftEditorSelection,
-  addFocusToSelection,
-};
+module.exports = setDraftEditorSelection;

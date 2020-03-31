@@ -1,12 +1,14 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
+ * @providesModule DraftEditorDragHandler
+ * @typechecks
  * @flow
- * @emails oncall+draft_js
  */
 
 'use strict';
@@ -19,10 +21,8 @@ const DraftModifier = require('DraftModifier');
 const EditorState = require('EditorState');
 
 const findAncestorOffsetKey = require('findAncestorOffsetKey');
-const getCorrectDocumentFromNode = require('getCorrectDocumentFromNode');
 const getTextContentFromFiles = require('getTextContentFromFiles');
 const getUpdatedSelectionState = require('getUpdatedSelectionState');
-const getWindowForNode = require('getWindowForNode');
 const isEventHandled = require('isEventHandled');
 const nullthrows = require('nullthrows');
 
@@ -36,15 +36,8 @@ function getSelectionForEvent(
   let node: ?Node = null;
   let offset: ?number = null;
 
-  const eventTargetDocument = getCorrectDocumentFromNode(event.currentTarget);
-  /* $FlowFixMe(>=0.68.0 site=www,mobile) This comment suppresses an error
-   * found when Flow v0.68 was deployed. To see the error delete this comment
-   * and run Flow. */
-  if (typeof eventTargetDocument.caretRangeFromPoint === 'function') {
-    /* $FlowFixMe(>=0.68.0 site=www,mobile) This comment suppresses an error
-     * found when Flow v0.68 was deployed. To see the error delete this comment
-     * and run Flow. */
-    const dropRange = eventTargetDocument.caretRangeFromPoint(event.x, event.y);
+  if (typeof document.caretRangeFromPoint === 'function') {
+    var dropRange = document.caretRangeFromPoint(event.x, event.y);
     node = dropRange.startContainer;
     offset = dropRange.startOffset;
   } else if (event.rangeParent) {
@@ -67,13 +60,12 @@ function getSelectionForEvent(
   );
 }
 
-const DraftEditorDragHandler = {
+var DraftEditorDragHandler = {
   /**
    * Drag originating from input terminated.
    */
   onDragEnd: function(editor: DraftEditor): void {
     editor.exitCurrentMode();
-    endDrag(editor);
   },
 
   /**
@@ -89,14 +81,13 @@ const DraftEditorDragHandler = {
     );
 
     e.preventDefault();
-    editor._dragCount = 0;
     editor.exitCurrentMode();
 
     if (dropSelection == null) {
       return;
     }
 
-    const files: Array<Blob> = (data.getFiles(): any);
+    const files = data.getFiles();
     if (files.length > 0) {
       if (
         editor.props.handleDroppedFiles &&
@@ -105,14 +96,14 @@ const DraftEditorDragHandler = {
         return;
       }
 
-      /* $FlowFixMe This comment suppresses an error found DataTransfer was
-       * typed. getFiles() returns an array of <Files extends Blob>, not Blob
-       */
       getTextContentFromFiles(files, fileText => {
-        fileText &&
-          editor.update(
-            insertTextAtSelection(editorState, dropSelection, fileText),
-          );
+        fileText && editor.update(
+          insertTextAtSelection(
+            editorState,
+            dropSelection,
+            fileText,
+          ),
+        );
       });
       return;
     }
@@ -122,39 +113,20 @@ const DraftEditorDragHandler = {
       editor.props.handleDrop &&
       isEventHandled(editor.props.handleDrop(dropSelection, data, dragType))
     ) {
-      // handled
-    } else if (editor._internalDrag) {
-      editor.update(moveText(editorState, dropSelection));
-    } else {
-      editor.update(
-        insertTextAtSelection(
-          editorState,
-          dropSelection,
-          (data.getText(): any),
-        ),
-      );
+      return;
     }
-    endDrag(editor);
+
+    if (editor._internalDrag) {
+      editor.update(moveText(editorState, dropSelection));
+      return;
+    }
+
+    editor.update(
+      insertTextAtSelection(editorState, dropSelection, data.getText()),
+    );
   },
+
 };
-
-function endDrag(editor) {
-  editor._internalDrag = false;
-
-  // Fix issue #1383
-  // Prior to React v16.5.0 onDrop breaks onSelect event:
-  // https://github.com/facebook/react/issues/11379.
-  // Dispatching a mouseup event on DOM node will make it go back to normal.
-  const editorNode = editor.editorContainer;
-  if (editorNode) {
-    const mouseUpEvent = new MouseEvent('mouseup', {
-      view: getWindowForNode(editorNode),
-      bubbles: true,
-      cancelable: true,
-    });
-    editorNode.dispatchEvent(mouseUpEvent);
-  }
-}
 
 function moveText(
   editorState: EditorState,
@@ -165,7 +137,11 @@ function moveText(
     editorState.getSelection(),
     targetSelection,
   );
-  return EditorState.push(editorState, newContentState, 'insert-fragment');
+  return EditorState.push(
+    editorState,
+    newContentState,
+    'insert-fragment',
+  );
 }
 
 /**
@@ -182,7 +158,11 @@ function insertTextAtSelection(
     text,
     editorState.getCurrentInlineStyle(),
   );
-  return EditorState.push(editorState, newContentState, 'insert-fragment');
+  return EditorState.push(
+    editorState,
+    newContentState,
+    'insert-fragment',
+  );
 }
 
 module.exports = DraftEditorDragHandler;

@@ -1,31 +1,32 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule keyCommandUndo
+ * @flow
  */
 
 'use strict';
 
-const EditorState = require('EditorState');
+var EditorState = require('EditorState');
 
 function keyCommandUndo(
   e: SyntheticKeyboardEvent<>,
   editorState: EditorState,
   updateFn: (editorState: EditorState) => void,
 ): void {
-  const undoneState = EditorState.undo(editorState);
+  var undoneState = EditorState.undo(editorState);
 
   // If the last change to occur was a spellcheck change, allow the undo
   // event to fall through to the browser. This allows the browser to record
   // the unwanted change, which should soon lead it to learn not to suggest
   // the correction again.
   if (editorState.getLastChangeType() === 'spellcheck-change') {
-    const nativelyRenderedContent = undoneState.getCurrentContent();
+    var nativelyRenderedContent = undoneState.getCurrentContent();
     updateFn(EditorState.set(undoneState, {nativelyRenderedContent}));
     return;
   }

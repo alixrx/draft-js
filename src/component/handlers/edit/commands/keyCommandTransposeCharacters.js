@@ -1,20 +1,21 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule keyCommandTransposeCharacters
+ * @flow
  */
 
 'use strict';
 
-const DraftModifier = require('DraftModifier');
-const EditorState = require('EditorState');
+var DraftModifier = require('DraftModifier');
+var EditorState = require('EditorState');
 
-const getContentStateFragment = require('getContentStateFragment');
+var getContentStateFragment = require('getContentStateFragment');
 
 /**
  * Transpose the characters on either side of a collapsed cursor, or
@@ -22,28 +23,28 @@ const getContentStateFragment = require('getContentStateFragment');
  * characters.
  */
 function keyCommandTransposeCharacters(editorState: EditorState): EditorState {
-  const selection = editorState.getSelection();
+  var selection = editorState.getSelection();
   if (!selection.isCollapsed()) {
     return editorState;
   }
 
-  const offset = selection.getAnchorOffset();
+  var offset = selection.getAnchorOffset();
   if (offset === 0) {
     return editorState;
   }
 
-  const blockKey = selection.getAnchorKey();
-  const content = editorState.getCurrentContent();
-  const block = content.getBlockForKey(blockKey);
-  const length = block.getLength();
+  var blockKey = selection.getAnchorKey();
+  var content = editorState.getCurrentContent();
+  var block = content.getBlockForKey(blockKey);
+  var length = block.getLength();
 
   // Nothing to transpose if there aren't two characters.
   if (length <= 1) {
     return editorState;
   }
 
-  let removalRange;
-  let finalSelection;
+  var removalRange;
+  var finalSelection;
 
   if (offset === length) {
     // The cursor is at the end of the block. Swap the last two characters.
@@ -56,28 +57,28 @@ function keyCommandTransposeCharacters(editorState: EditorState): EditorState {
 
   // Extract the character to move as a fragment. This preserves its
   // styling and entity, if any.
-  const movedFragment = getContentStateFragment(content, removalRange);
-  const afterRemoval = DraftModifier.removeRange(
+  var movedFragment = getContentStateFragment(content, removalRange);
+  var afterRemoval = DraftModifier.removeRange(
     content,
     removalRange,
     'backward',
   );
 
   // After the removal, the insertion target is one character back.
-  const selectionAfter = afterRemoval.getSelectionAfter();
-  const targetOffset = selectionAfter.getAnchorOffset() - 1;
-  const targetRange = selectionAfter.merge({
+  var selectionAfter = afterRemoval.getSelectionAfter();
+  var targetOffset = selectionAfter.getAnchorOffset() - 1;
+  var targetRange = selectionAfter.merge({
     anchorOffset: targetOffset,
     focusOffset: targetOffset,
   });
 
-  const afterInsert = DraftModifier.replaceWithFragment(
+  var afterInsert = DraftModifier.replaceWithFragment(
     afterRemoval,
     targetRange,
     movedFragment,
   );
 
-  const newEditorState = EditorState.push(
+  var newEditorState = EditorState.push(
     editorState,
     afterInsert,
     'insert-fragment',

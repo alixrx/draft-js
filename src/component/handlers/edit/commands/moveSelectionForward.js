@@ -1,20 +1,19 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule moveSelectionForward
+ * @flow
  */
 
 'use strict';
 
 import type EditorState from 'EditorState';
 import type SelectionState from 'SelectionState';
-
-const warning = require('warning');
 
 /**
  * Given a collapsed selection, move the focus `maxDistance` forward within
@@ -28,22 +27,17 @@ function moveSelectionForward(
   editorState: EditorState,
   maxDistance: number,
 ): SelectionState {
-  const selection = editorState.getSelection();
-  // Should eventually make this an invariant
-  warning(
-    selection.isCollapsed(),
-    'moveSelectionForward should only be called with a collapsed SelectionState',
-  );
-  const key = selection.getStartKey();
-  const offset = selection.getStartOffset();
-  const content = editorState.getCurrentContent();
+  var selection = editorState.getSelection();
+  var key = selection.getStartKey();
+  var offset = selection.getStartOffset();
+  var content = editorState.getCurrentContent();
 
-  let focusKey = key;
-  let focusOffset;
+  var focusKey = key;
+  var focusOffset;
 
-  const block = content.getBlockForKey(key);
+  var block = content.getBlockForKey(key);
 
-  if (maxDistance > block.getText().length - offset) {
+  if (maxDistance > (block.getText().length - offset)) {
     focusKey = content.getKeyAfter(key);
     focusOffset = 0;
   } else {

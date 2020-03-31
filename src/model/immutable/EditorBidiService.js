@@ -1,28 +1,30 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
+ * @providesModule EditorBidiService
+ * @typechecks
  * @flow
- * @emails oncall+draft_js
  */
 
 'use strict';
 
 import type ContentState from 'ContentState';
 
-const UnicodeBidiService = require('UnicodeBidiService');
+var Immutable = require('immutable');
+var UnicodeBidiService = require('UnicodeBidiService');
 
-const Immutable = require('immutable');
-const nullthrows = require('nullthrows');
+var nullthrows = require('nullthrows');
 
-const {OrderedMap} = Immutable;
+var {OrderedMap} = Immutable;
 
-let bidiService;
+var bidiService;
 
-const EditorBidiService = {
+var EditorBidiService = {
   getDirectionMap: function(
     content: ContentState,
     prevBidiMap: ?OrderedMap<any, any>,
@@ -33,11 +35,11 @@ const EditorBidiService = {
       bidiService.reset();
     }
 
-    const blockMap = content.getBlockMap();
-    const nextBidi = blockMap
+    var blockMap = content.getBlockMap();
+    var nextBidi = blockMap
       .valueSeq()
       .map(block => nullthrows(bidiService).getDirection(block.getText()));
-    const bidiMap = OrderedMap(blockMap.keySeq().zip(nextBidi));
+    var bidiMap = OrderedMap(blockMap.keySeq().zip(nextBidi));
 
     if (prevBidiMap != null && Immutable.is(prevBidiMap, bidiMap)) {
       return prevBidiMap;

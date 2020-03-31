@@ -1,74 +1,86 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
+ * @providesModule DraftEntity
+ * @typechecks
  * @flow
- * @emails oncall+draft_js
  */
 
 import type {DraftEntityMutability} from 'DraftEntityMutability';
 import type {DraftEntityType} from 'DraftEntityType';
 
-const DraftEntityInstance = require('DraftEntityInstance');
+var DraftEntityInstance = require('DraftEntityInstance');
+var Immutable = require('immutable');
 
-const Immutable = require('immutable');
-const invariant = require('invariant');
+var invariant = require('invariant');
 
-const {Map} = Immutable;
+var {Map} = Immutable;
 
-let instances: Map<string, DraftEntityInstance> = Map();
-let instanceKey = 0;
+var instances: Map<string, DraftEntityInstance> = Map();
+var instanceKey = 0;
 
 /**
  * Temporary utility for generating the warnings
  */
 function logWarning(oldMethodCall, newMethodCall) {
   console.warn(
-    'WARNING: ' +
-      oldMethodCall +
-      ' will be deprecated soon!\nPlease use "' +
-      newMethodCall +
-      '" instead.',
+    'WARNING: '
+    + oldMethodCall
+    + ' will be deprecated soon!\nPlease use "'
+    + newMethodCall
+    + '" instead.',
   );
 }
 
 export type DraftEntityMapObject = {
   getLastCreatedEntityKey: () => string,
+
   create: (
     type: DraftEntityType,
     mutability: DraftEntityMutability,
     data?: Object,
   ) => string,
+
   add: (instance: DraftEntityInstance) => string,
+
   get: (key: string) => DraftEntityInstance,
+
   mergeData: (
     key: string,
-    toMerge: {[key: string]: any, ...},
+    toMerge: {[key: string]: any},
   ) => DraftEntityInstance,
+
   replaceData: (
     key: string,
-    newData: {[key: string]: any, ...},
+    newData: {[key: string]: any},
   ) => DraftEntityInstance,
+
   __getLastCreatedEntityKey: () => string,
+
   __create: (
     type: DraftEntityType,
     mutability: DraftEntityMutability,
     data?: Object,
   ) => string,
+
   __add: (instance: DraftEntityInstance) => string,
+
   __get: (key: string) => DraftEntityInstance,
+
   __mergeData: (
     key: string,
-    toMerge: {[key: string]: any, ...},
+    toMerge: {[key: string]: any}
   ) => DraftEntityInstance,
+
   __replaceData: (
     key: string,
-    newData: {[key: string]: any, ...},
+    newData: {[key: string]: any}
   ) => DraftEntityInstance,
-  ...
 };
 
 /**
@@ -84,7 +96,7 @@ export type DraftEntityMapObject = {
  * generated via DraftEntity.create() and used to obtain entity metadata
  * via DraftEntity.get().
  */
-const DraftEntity: DraftEntityMapObject = {
+var DraftEntity:DraftEntityMapObject = {
   /**
    * WARNING: This method will be deprecated soon!
    * Please use 'contentState.getLastCreatedEntityKey' instead.
@@ -116,7 +128,10 @@ const DraftEntity: DraftEntityMapObject = {
     mutability: DraftEntityMutability,
     data?: Object,
   ): string {
-    logWarning('DraftEntity.create', 'contentState.createEntity');
+    logWarning(
+      'DraftEntity.create',
+      'contentState.createEntity',
+    );
     return DraftEntity.__create(type, mutability, data);
   },
 
@@ -128,7 +143,10 @@ const DraftEntity: DraftEntityMapObject = {
    * useful when restoring instances from the server.
    */
   add: function(instance: DraftEntityInstance): string {
-    logWarning('DraftEntity.add', 'contentState.addEntity');
+    logWarning(
+      'DraftEntity.add',
+      'contentState.addEntity',
+    );
     return DraftEntity.__add(instance);
   },
 
@@ -139,7 +157,10 @@ const DraftEntity: DraftEntityMapObject = {
    * Retrieve the entity corresponding to the supplied key string.
    */
   get: function(key: string): DraftEntityInstance {
-    logWarning('DraftEntity.get', 'contentState.getEntity');
+    logWarning(
+      'DraftEntity.get',
+      'contentState.getEntity',
+    );
     return DraftEntity.__get(key);
   },
 
@@ -153,9 +174,12 @@ const DraftEntity: DraftEntityMapObject = {
    */
   mergeData: function(
     key: string,
-    toMerge: {[key: string]: any, ...},
+    toMerge: {[key: string]: any},
   ): DraftEntityInstance {
-    logWarning('DraftEntity.mergeData', 'contentState.mergeEntityData');
+    logWarning(
+      'DraftEntity.mergeData',
+      'contentState.mergeEntityData',
+    );
     return DraftEntity.__mergeData(key, toMerge);
   },
 
@@ -167,9 +191,12 @@ const DraftEntity: DraftEntityMapObject = {
    */
   replaceData: function(
     key: string,
-    newData: {[key: string]: any, ...},
+    newData: {[key: string]: any},
   ): DraftEntityInstance {
-    logWarning('DraftEntity.replaceData', 'contentState.replaceEntityData');
+    logWarning(
+      'DraftEntity.replaceData',
+      'contentState.replaceEntityData',
+    );
     return DraftEntity.__replaceData(key, newData);
   },
 
@@ -208,7 +235,7 @@ const DraftEntity: DraftEntityMapObject = {
    * useful when restoring instances from the server.
    */
   __add: function(instance: DraftEntityInstance): string {
-    const key = '' + ++instanceKey;
+    var key = '' + (++instanceKey);
     instances = instances.set(key, instance);
     return key;
   },
@@ -217,7 +244,7 @@ const DraftEntity: DraftEntityMapObject = {
    * Retrieve the entity corresponding to the supplied key string.
    */
   __get: function(key: string): DraftEntityInstance {
-    const instance = instances.get(key);
+    var instance = instances.get(key);
     invariant(!!instance, 'Unknown DraftEntity key: %s.', key);
     return instance;
   },
@@ -229,11 +256,11 @@ const DraftEntity: DraftEntityMapObject = {
    */
   __mergeData: function(
     key: string,
-    toMerge: {[key: string]: any, ...},
+    toMerge: {[key: string]: any},
   ): DraftEntityInstance {
-    const instance = DraftEntity.__get(key);
-    const newData = {...instance.getData(), ...toMerge};
-    const newInstance = instance.set('data', newData);
+    var instance = DraftEntity.__get(key);
+    var newData = {...instance.getData(), ...toMerge};
+    var newInstance = instance.set('data', newData);
     instances = instances.set(key, newInstance);
     return newInstance;
   },
@@ -243,7 +270,7 @@ const DraftEntity: DraftEntityMapObject = {
    */
   __replaceData: function(
     key: string,
-    newData: {[key: string]: any, ...},
+    newData: {[key: string]: any},
   ): DraftEntityInstance {
     const instance = DraftEntity.__get(key);
     const newInstance = instance.set('data', newData);

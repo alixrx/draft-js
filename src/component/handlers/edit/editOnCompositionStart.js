@@ -1,19 +1,20 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule editOnCompositionStart
+ * @flow
  */
 
 'use strict';
 
 import type DraftEditor from 'DraftEditor.react';
 
-const EditorState = require('EditorState');
+var EditorState = require('EditorState');
 
 /**
  * The user has begun using an IME input system. Switching to `composite` mode

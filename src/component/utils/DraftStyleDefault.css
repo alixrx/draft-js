@@ -1,10 +1,6 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
  * @providesModule DraftStyleDefault
+ * @permanent
  */
 
 .public/DraftStyleDefault/block {
@@ -155,12 +151,12 @@
 }
 
 .public/DraftStyleDefault/orderedListItem.public/DraftStyleDefault/depth1:before {
-  content: counter(ol1,lower-alpha) ". ";
+  content: counter(ol1) ". ";
   counter-increment: ol1;
 }
 
 .public/DraftStyleDefault/orderedListItem.public/DraftStyleDefault/depth2:before {
-  content: counter(ol2,lower-roman) ". ";
+  content: counter(ol2) ". ";
   counter-increment: ol2;
 }
 
@@ -170,7 +166,7 @@
 }
 
 .public/DraftStyleDefault/orderedListItem.public/DraftStyleDefault/depth4:before {
-  content: counter(ol4,lower-alpha) ". ";
+  content: counter(ol4) ". ";
   counter-increment: ol4;
 }
 

@@ -1,17 +1,18 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule DraftEntityMutability
+ * @flow
  */
 
 'use strict';
 
-const ComposedEntityMutability = require('ComposedEntityMutability');
+var ComposedEntityMutability = require('ComposedEntityMutability');
 
 /**
  * An enum representing the possible "mutability" options for an entity.
@@ -34,7 +35,7 @@ const ComposedEntityMutability = require('ComposedEntityMutability');
  *
  * `SEGMENTED`:
  *   Segmented entities allow the removal of partial ranges of text, as
- *   separated by a delimiter. Adding characters within the range will remove
+ *   separated by a delimiter. Adding characters wihin the range will remove
  *   the entity from the entire range. Deleting characters within a segmented
  *   entity will delete only the segments affected by the deletion. Example:
  *   Facebook User mentions.

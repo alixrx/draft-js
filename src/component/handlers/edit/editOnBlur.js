@@ -1,12 +1,13 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule editOnBlur
+ * @flow
  */
 
 'use strict';
@@ -18,7 +19,7 @@ const EditorState = require('EditorState');
 const containsNode = require('containsNode');
 const getActiveElement = require('getActiveElement');
 
-function editOnBlur(editor: DraftEditor, e: SyntheticEvent<HTMLElement>): void {
+function editOnBlur(editor: DraftEditor, e: SyntheticEvent<>): void {
   // In a contentEditable element, when you select a range and then click
   // another active element, this does trigger a `blur` event but will not
   // remove the DOM selection from the contenteditable.
@@ -27,15 +28,9 @@ function editOnBlur(editor: DraftEditor, e: SyntheticEvent<HTMLElement>): void {
   // We therefore force the issue to be certain, checking whether the active
   // element is `body` to force it when blurring occurs within the window (as
   // opposed to clicking to another tab or window).
-  const {ownerDocument} = e.currentTarget;
-  if (
-    // This ESLint rule conflicts with `sketchy-null-bool` flow check
-    // eslint-disable-next-line no-extra-boolean-cast
-    !Boolean(editor.props.preserveSelectionOnBlur) &&
-    getActiveElement(ownerDocument) === ownerDocument.body
-  ) {
-    const selection = ownerDocument.defaultView.getSelection();
-    const editorNode = editor.editor;
+  if (getActiveElement() === document.body) {
+    const selection = global.getSelection();
+    const editorNode = editor.refs.editor;
     if (
       selection.rangeCount === 1 &&
       containsNode(editorNode, selection.anchorNode) &&
@@ -45,13 +40,13 @@ function editOnBlur(editor: DraftEditor, e: SyntheticEvent<HTMLElement>): void {
     }
   }
 
-  const editorState = editor._latestEditorState;
-  const currentSelection = editorState.getSelection();
+  var editorState = editor._latestEditorState;
+  var currentSelection = editorState.getSelection();
   if (!currentSelection.getHasFocus()) {
     return;
   }
 
-  const selection = currentSelection.set('hasFocus', false);
+  var selection = currentSelection.set('hasFocus', false);
   editor.props.onBlur && editor.props.onBlur(e);
   editor.update(EditorState.acceptSelection(editorState, selection));
 }

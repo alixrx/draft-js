@@ -1,35 +1,38 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule getSampleStateForTesting
+ * @typechecks
+ * @flow
  */
 
 'use strict';
 
-const BlockMapBuilder = require('BlockMapBuilder');
-const CharacterMetadata = require('CharacterMetadata');
-const ContentBlock = require('ContentBlock');
-const ContentState = require('ContentState');
-const EditorState = require('EditorState');
-const SampleDraftInlineStyle = require('SampleDraftInlineStyle');
-const SelectionState = require('SelectionState');
+var BlockMapBuilder = require('BlockMapBuilder');
+var CharacterMetadata = require('CharacterMetadata');
+var ContentBlock = require('ContentBlock');
+var ContentState = require('ContentState');
+var EditorState = require('EditorState');
+var Immutable = require('immutable');
+var SampleDraftInlineStyle = require('SampleDraftInlineStyle');
+var SelectionState = require('SelectionState');
 
-const Immutable = require('immutable');
+var {BOLD, ITALIC} = SampleDraftInlineStyle;
+var ENTITY_KEY = '123';
 
-const {BOLD, ITALIC} = SampleDraftInlineStyle;
-const ENTITY_KEY = '1';
-
-const BLOCKS = [
+var BLOCKS = [
   new ContentBlock({
     key: 'a',
     type: 'unstyled',
     text: 'Alpha',
-    characterList: Immutable.List(Immutable.Repeat(CharacterMetadata.EMPTY, 5)),
+    characterList: Immutable.List(
+      Immutable.Repeat(CharacterMetadata.EMPTY, 5),
+    ),
   }),
   new ContentBlock({
     key: 'b',
@@ -44,24 +47,6 @@ const BLOCKS = [
   }),
   new ContentBlock({
     key: 'c',
-    type: 'code-block',
-    text: 'Test',
-    characterList: Immutable.List(Immutable.Repeat(CharacterMetadata.EMPTY, 4)),
-  }),
-  new ContentBlock({
-    key: 'd',
-    type: 'code-block',
-    text: '',
-    characterList: Immutable.List(),
-  }),
-  new ContentBlock({
-    key: 'e',
-    type: 'code-block',
-    text: '',
-    characterList: Immutable.List(),
-  }),
-  new ContentBlock({
-    key: 'f',
     type: 'blockquote',
     text: 'Charlie',
     characterList: Immutable.List(
@@ -73,7 +58,7 @@ const BLOCKS = [
   }),
 ];
 
-const selectionState = new SelectionState({
+var selectionState = new SelectionState({
   anchorKey: 'a',
   anchorOffset: 0,
   focusKey: 'a',
@@ -82,27 +67,19 @@ const selectionState = new SelectionState({
   hasFocus: true,
 });
 
-const blockMap = BlockMapBuilder.createFromArray(BLOCKS);
-const contentState = new ContentState({
+var blockMap = BlockMapBuilder.createFromArray(BLOCKS);
+var contentState = new ContentState({
   blockMap,
   entityMap: Immutable.OrderedMap(),
   selectionBefore: selectionState,
   selectionAfter: selectionState,
-}).createEntity({
-  type: 'IMAGE',
-  mutability: 'IMMUTABLE',
-  data: null,
 });
 
-let editorState = EditorState.createWithContent(contentState);
+var editorState = EditorState.createWithContent(contentState);
 editorState = EditorState.forceSelection(editorState, selectionState);
 
-const getSampleStateForTesting = (): {|
-  editorState: EditorState,
-  contentState: ContentState,
-  selectionState: SelectionState,
-|} => {
+function getSampleStateForTesting(): Object {
   return {editorState, contentState, selectionState};
-};
+}
 
 module.exports = getSampleStateForTesting;

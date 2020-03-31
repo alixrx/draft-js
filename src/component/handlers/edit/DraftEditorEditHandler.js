@@ -1,19 +1,16 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @format
- * @flow strict-local
- * @emails oncall+draft_js
+ * @providesModule DraftEditorEditHandler
+ * @flow
  */
 
 'use strict';
-
-import type DraftEditor from 'DraftEditor.react';
-
-const UserAgent = require('UserAgent');
 
 const onBeforeInput = require('editOnBeforeInput');
 const onBlur = require('editOnBlur');
@@ -28,12 +25,6 @@ const onKeyDown = require('editOnKeyDown');
 const onPaste = require('editOnPaste');
 const onSelect = require('editOnSelect');
 
-const isChrome = UserAgent.isBrowser('Chrome');
-
-const selectionHandler: (e: DraftEditor) => void = isChrome
-  ? onSelect
-  : e => {};
-
 const DraftEditorEditHandler = {
   onBeforeInput,
   onBlur,
@@ -47,12 +38,6 @@ const DraftEditorEditHandler = {
   onKeyDown,
   onPaste,
   onSelect,
-  // In certain cases, contenteditable on chrome does not fire the onSelect
-  // event, causing problems with cursor positioning. Therefore, the selection
-  // state update handler is added to more events to ensure that the selection
-  // state is always synced with the actual cursor positions.
-  onMouseUp: selectionHandler,
-  onKeyUp: selectionHandler,
 };
 
 module.exports = DraftEditorEditHandler;

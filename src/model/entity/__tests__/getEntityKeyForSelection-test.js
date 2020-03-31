@@ -1,100 +1,97 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) 2013-present, Facebook, Inc.
+ * All rights reserved.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * This source code is licensed under the BSD-style license found in the
+ * LICENSE file in the root directory of this source tree. An additional grant
+ * of patent rights can be found in the PATENTS file in the same directory.
  *
- * @emails oncall+draft_js
- * @flow strict-local
- * @format
+ * @emails isaac, oncall+ui_infra
  */
 
-const getEntityKeyForSelection = require('getEntityKeyForSelection');
-const getSampleStateForTesting = require('getSampleStateForTesting');
+jest.disableAutomock();
 
-const {contentState, selectionState} = getSampleStateForTesting();
+var getEntityKeyForSelection = require('getEntityKeyForSelection');
+var getSampleStateForTesting = require('getSampleStateForTesting');
 
-const initialSelectionState = selectionState.merge({
+var {
+  contentState,
+  selectionState,
+} = getSampleStateForTesting();
+
+selectionState = selectionState.merge({
   anchorKey: 'b',
   focusKey: 'b',
 });
 
-const COLLAPSED_SELECTION = initialSelectionState.merge({
-  anchorOffset: 2,
-  focusOffset: 2,
-});
-
-const COLLAPSED_SELECTION_ENTITY_END = initialSelectionState.merge({
-  anchorOffset: 5,
-  focusOffset: 5,
-});
-
-const NON_COLLAPSED_SELECTION = initialSelectionState.merge({
-  anchorOffset: 2,
-  focusKey: 'c',
-  focusOffset: 2,
-});
-
-const setEntityMutability = mutability => {
+function setEntityMutability(mutability) {
   contentState.getEntityMap().__get = () => ({
     getMutability: () => mutability,
   });
-};
+}
+describe('getEntityKeyForSelection', () => {
+  describe('collapsed selection', () => {
+    var collapsed = selectionState.merge({
+      anchorOffset: 2,
+      focusOffset: 2,
+    });
 
-test('must return null at start of block with collapsed selection', () => {
-  const key = getEntityKeyForSelection(contentState, initialSelectionState);
-  expect(key).toMatchSnapshot();
-});
 
-test('must return key if mutable with collapsed selection', () => {
-  setEntityMutability('MUTABLE');
-  const key = getEntityKeyForSelection(contentState, COLLAPSED_SELECTION);
-  expect(key).toMatchSnapshot();
-});
+    it('must return null at start of block', () => {
+      var key = getEntityKeyForSelection(contentState, selectionState);
+      expect(key).toBe(null);
+    });
 
-test('must not return key if mutable with collapsed selection at end of an entity', () => {
-  setEntityMutability('MUTABLE');
-  const key = getEntityKeyForSelection(
-    contentState,
-    COLLAPSED_SELECTION_ENTITY_END,
-  );
-  expect(key).toMatchSnapshot();
-});
+    it('must return key if mutable', () => {
+      setEntityMutability('MUTABLE');
+      var key = getEntityKeyForSelection(contentState, collapsed);
+      expect(key).toBe('123');
+    });
 
-test('must not return key if immutable with collapsed selection', () => {
-  setEntityMutability('IMMUTABLE');
-  const key = getEntityKeyForSelection(contentState, COLLAPSED_SELECTION);
-  expect(key).toMatchSnapshot();
-});
+    it('must not return key if immutable', () => {
+      setEntityMutability('IMMUTABLE');
+      var key = getEntityKeyForSelection(contentState, collapsed);
+      expect(key).toBe(null);
+    });
 
-test('must not return key if segmented with collapsed selection', () => {
-  setEntityMutability('SEGMENTED');
-  const key = getEntityKeyForSelection(contentState, COLLAPSED_SELECTION);
-  expect(key).toMatchSnapshot();
-});
-
-test('must return null if start is at end of block', () => {
-  const startsAtEnd = NON_COLLAPSED_SELECTION.merge({
-    anchorOffset: contentState.getBlockForKey('b').getLength(),
+    it('must not return key if segmented', () => {
+      setEntityMutability('SEGMENTED');
+      var key = getEntityKeyForSelection(contentState, collapsed);
+      expect(key).toBe(null);
+    });
   });
-  const key = getEntityKeyForSelection(contentState, startsAtEnd);
-  expect(key).toMatchSnapshot();
-});
 
-test('must return key if mutable', () => {
-  setEntityMutability('MUTABLE');
-  const key = getEntityKeyForSelection(contentState, NON_COLLAPSED_SELECTION);
-  expect(key).toMatchSnapshot();
-});
+  describe('non-collapsed selection', () => {
+    var nonCollapsed = selectionState.merge({
+      anchorOffset: 2,
+      focusKey: 'c',
+      focusOffset: 2,
+    });
 
-test('must not return key if immutable', () => {
-  setEntityMutability('IMMUTABLE');
-  const key = getEntityKeyForSelection(contentState, NON_COLLAPSED_SELECTION);
-  expect(key).toMatchSnapshot();
-});
+    it('must return null if start is at end of block', () => {
+      var startsAtEnd = nonCollapsed.merge({
+        anchorOffset: contentState.getBlockForKey('b').getLength(),
+      });
+      var key = getEntityKeyForSelection(contentState, startsAtEnd);
+      expect(key).toBe(null);
+    });
 
-test('must not return key if segmented', () => {
-  setEntityMutability('SEGMENTED');
-  const key = getEntityKeyForSelection(contentState, NON_COLLAPSED_SELECTION);
-  expect(key).toMatchSnapshot();
+    it('must return key if mutable', () => {
+      setEntityMutability('MUTABLE');
+      var key = getEntityKeyForSelection(contentState, nonCollapsed);
+      expect(key).toBe('123');
+    });
+
+    it('must not return key if immutable', () => {
+      setEntityMutability('IMMUTABLE');
+      var key = getEntityKeyForSelection(contentState, nonCollapsed);
+      expect(key).toBe(null);
+    });
+
+    it('must not return key if segmented', () => {
+      setEntityMutability('SEGMENTED');
+      var key = getEntityKeyForSelection(contentState, nonCollapsed);
+      expect(key).toBe(null);
+    });
+  });
 });
