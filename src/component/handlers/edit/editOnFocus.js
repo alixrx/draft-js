@@ -12,12 +12,11 @@
 
 'use strict';
 
+var EditorState = require('EditorState');
+
 import type DraftEditor from 'DraftEditor.react';
 
-var EditorState = require('EditorState');
-var UserAgent = require('UserAgent');
-
-function editOnFocus(editor: DraftEditor, e: SyntheticFocusEvent<>): void {
+function editOnFocus(editor: DraftEditor, e: SyntheticFocusEvent): void {
   var editorState = editor._latestEditorState;
   var currentSelection = editorState.getSelection();
   if (currentSelection.getHasFocus()) {
@@ -33,15 +32,7 @@ function editOnFocus(editor: DraftEditor, e: SyntheticFocusEvent<>): void {
   // moves the cursor back to the beginning of the editor, so we force the
   // selection here instead of simply accepting it in order to preserve the
   // old cursor position. See https://crbug.com/540004.
-  // But it looks like this is fixed in Chrome 60.0.3081.0.
-  // Other browsers also don't have this bug, so we prefer to acceptSelection
-  // when possible, to ensure that unfocusing and refocusing a Draft editor
-  // doesn't preserve the selection, matching how textareas work.
-  if (UserAgent.isBrowser('Chrome < 60.0.3081.0')) {
-    editor.update(EditorState.forceSelection(editorState, selection));
-  } else {
-    editor.update(EditorState.acceptSelection(editorState, selection));
-  }
+  editor.update(EditorState.forceSelection(editorState, selection));
 }
 
 module.exports = editOnFocus;

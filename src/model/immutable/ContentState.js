@@ -13,11 +13,6 @@
 
 'use strict';
 
-import type {BlockMap} from 'BlockMap';
-import type DraftEntityInstance from 'DraftEntityInstance';
-import type {DraftEntityMutability} from 'DraftEntityMutability';
-import type {DraftEntityType} from 'DraftEntityType';
-
 const BlockMapBuilder = require('BlockMapBuilder');
 const CharacterMetadata = require('CharacterMetadata');
 const ContentBlock = require('ContentBlock');
@@ -27,6 +22,11 @@ const SelectionState = require('SelectionState');
 
 const generateRandomKey = require('generateRandomKey');
 const sanitizeDraftText = require('sanitizeDraftText');
+
+import type {BlockMap} from 'BlockMap';
+import type DraftEntityInstance from 'DraftEntityInstance';
+import type {DraftEntityMutability} from 'DraftEntityMutability';
+import type {DraftEntityType} from 'DraftEntityType';
 
 const {List, Record, Repeat} = Immutable;
 
@@ -122,7 +122,7 @@ class ContentState extends ContentStateRecord {
 
   getLastCreatedEntityKey() {
     // TODO: update this when we fully remove DraftEntity
-    return DraftEntity.__getLastCreatedEntityKey();
+    return DraftEntity._getLastCreatedEntityKey();
   }
 
   hasText(): boolean {
@@ -136,10 +136,10 @@ class ContentState extends ContentStateRecord {
   createEntity(
     type: DraftEntityType,
     mutability: DraftEntityMutability,
-    data?: Object,
+    data?: Object
   ): ContentState {
     // TODO: update this when we fully remove DraftEntity
-    DraftEntity.__create(
+    DraftEntity._create(
       type,
       mutability,
       data,
@@ -149,31 +149,31 @@ class ContentState extends ContentStateRecord {
 
   mergeEntityData(
     key: string,
-    toMerge: {[key: string]: any},
+    toMerge: {[key: string]: any}
   ): ContentState {
     // TODO: update this when we fully remove DraftEntity
-    DraftEntity.__mergeData(key, toMerge);
+    DraftEntity._mergeData(key, toMerge);
     return this;
   }
 
   replaceEntityData(
     key: string,
-    newData: {[key: string]: any},
+    newData: {[key: string]: any}
   ): ContentState {
     // TODO: update this when we fully remove DraftEntity
-    DraftEntity.__replaceData(key, newData);
+    DraftEntity._replaceData(key, newData);
     return this;
   }
 
   addEntity(instance: DraftEntityInstance): ContentState {
     // TODO: update this when we fully remove DraftEntity
-    DraftEntity.__add(instance);
+    DraftEntity._add(instance);
     return this;
   }
 
   getEntity(key: string): DraftEntityInstance {
     // TODO: update this when we fully remove DraftEntity
-    return DraftEntity.__get(key);
+    return DraftEntity._get(key);
   }
 
   static createFromBlockArray(
@@ -209,7 +209,7 @@ class ContentState extends ContentStateRecord {
           type: 'unstyled',
           characterList: List(Repeat(CharacterMetadata.EMPTY, block.length)),
         });
-      },
+      }
     );
     return ContentState.createFromBlockArray(blocks);
   }

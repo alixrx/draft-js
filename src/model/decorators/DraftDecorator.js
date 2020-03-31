@@ -15,12 +15,6 @@
 import type ContentBlock from 'ContentBlock';
 import type ContentState from 'ContentState';
 
-export type DraftDecoratorStrategy = (
-  block: ContentBlock,
-  callback: (start: number, end: number) => void,
-  contentState: ContentState,
-) => void;
-
 /**
  * A DraftDecorator is a strategy-component pair intended for use when
  * rendering content.
@@ -37,7 +31,11 @@ export type DraftDecoratorStrategy = (
  *   - "props": Props to be passed into the React component that will be used.
  */
 export type DraftDecorator = {
-  strategy: DraftDecoratorStrategy,
+  strategy: (
+    block: ContentBlock,
+    callback: (start: number, end: number) => void,
+    contentState: ContentState,
+  ) => void,
   component: Function,
   props?: Object,
 };

@@ -17,8 +17,6 @@ const React = require('React');
 const ReactDOM = require('ReactDOM');
 const UserAgent = require('UserAgent');
 
-const invariant = require('invariant');
-
 // In IE, spans with <br> tags render as two newlines. By rendering a span
 // with only a newline character, we can be sure to render a single line.
 const useNewlineChar = UserAgent.isBrowser('IE <= 11');
@@ -60,7 +58,7 @@ type Props = {
  * nodes with DOM state that already matches the expectations of our immutable
  * editor state.
  */
-class DraftEditorTextNode extends React.Component<Props> {
+class DraftEditorTextNode extends React.Component {
   _forceFlag: boolean;
 
   constructor(props: Props) {
@@ -71,7 +69,6 @@ class DraftEditorTextNode extends React.Component<Props> {
   shouldComponentUpdate(nextProps: Props): boolean {
     const node = ReactDOM.findDOMNode(this);
     const shouldBeNewline = nextProps.children === '';
-    invariant(node instanceof Element, 'node is not an Element');
     if (shouldBeNewline) {
       return !isNewline(node);
     }
@@ -84,7 +81,7 @@ class DraftEditorTextNode extends React.Component<Props> {
     this._forceFlag = !this._forceFlag;
   }
 
-  render(): React.Node {
+  render(): React.Element<any> {
     if (this.props.children === '') {
       return this._forceFlag ? NEWLINE_A : NEWLINE_B;
     }

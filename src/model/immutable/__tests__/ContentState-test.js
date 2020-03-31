@@ -50,7 +50,7 @@ describe('ContentState', () => {
 
   function getSample(textBlocks) {
     return getSampleFromConfig(
-      getConfigForText(textBlocks),
+      getConfigForText(textBlocks)
     );
   }
 
@@ -99,7 +99,7 @@ describe('ContentState', () => {
     let contentState;
     beforeEach(() => {
       contentState = ContentState.createFromText('');
-      jest.resetModules();
+      jest.resetModuleRegistry();
     });
 
     function createLink() {
@@ -113,9 +113,7 @@ describe('ContentState', () => {
 
     it('must retrieve an instance given a key', () => {
       const contentState = createLink();
-      const retrieved = contentState.getEntity(
-        contentState.getLastCreatedEntityKey(),
-      );
+      const retrieved = contentState.getEntity(contentState.getLastCreatedEntityKey());
       expect(retrieved.getType()).toBe('LINK');
       expect(retrieved.getMutability()).toBe('MUTABLE');
       expect(retrieved.getData()).toEqual({uri: 'zombo.com'});
@@ -133,8 +131,7 @@ describe('ContentState', () => {
       // Merge new property.
       const newData = {foo: 'bar'};
       const key = contentState.getLastCreatedEntityKey();
-      const contentStateWithNewProp =
-        contentState.mergeEntityData(key, newData);
+      const contentStateWithNewProp = contentState.mergeEntityData(key, newData);
       const updatedEntity = contentStateWithNewProp.getEntity(key);
       expect(updatedEntity.getData()).toEqual({
         uri: 'zombo.com',
@@ -142,8 +139,7 @@ describe('ContentState', () => {
       });
       // Replace existing property.
       const withNewURI = {uri: 'homestarrunner.com'};
-      const contentStateWithUpdatedProp =
-        contentStateWithNewProp.mergeEntityData(key, withNewURI);
+      const contentStateWithUpdatedProp = contentStateWithNewProp.mergeEntityData(key, withNewURI);
       const entityWithNewURI = contentStateWithUpdatedProp.getEntity(key);
       expect(entityWithNewURI.getData()).toEqual({
         uri: 'homestarrunner.com',
@@ -158,8 +154,7 @@ describe('ContentState', () => {
         uri: 'something.com',
         newProp: 'baz',
       };
-      const updatedContentState =
-        contentState.replaceEntityData(key, replacedData);
+      const updatedContentState = contentState.replaceEntityData(key, replacedData);
       const entityWithReplacedData = updatedContentState.getEntity(key);
       expect(entityWithReplacedData.getData()).toEqual(replacedData);
     });

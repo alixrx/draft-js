@@ -13,8 +13,9 @@
 
 'use strict';
 
-var {OrderedSet} = require('immutable');
 var UnicodeUtils = require('UnicodeUtils');
+
+var {OrderedSet} = require('immutable');
 
 var {substr} = UnicodeUtils;
 
@@ -27,7 +28,7 @@ const EMPTY_SET = OrderedSet();
  */
 function decodeInlineStyleRanges(
   text: string,
-  ranges?: Array<Object>,
+  ranges?: Array<Object>
 ): Array<DraftInlineStyle> {
   var styles = Array(text.length).fill(EMPTY_SET);
   if (ranges) {

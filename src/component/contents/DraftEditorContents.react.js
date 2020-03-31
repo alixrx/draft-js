@@ -13,9 +13,6 @@
 
 'use strict';
 
-import type ContentBlock from 'ContentBlock';
-import type {BidiDirection} from 'UnicodeBidiDirection';
-
 const DraftEditorBlock = require('DraftEditorBlock.react');
 const DraftOffsetKey = require('DraftOffsetKey');
 const EditorState = require('EditorState');
@@ -25,11 +22,13 @@ const cx = require('cx');
 const joinClasses = require('joinClasses');
 const nullthrows = require('nullthrows');
 
+import type {BidiDirection} from 'UnicodeBidiDirection';
+import type ContentBlock from 'ContentBlock';
+
 type Props = {
   blockRendererFn: Function,
   blockStyleFn: (block: ContentBlock) => string,
   editorState: EditorState,
-  textDirectionality?: BidiDirection,
 };
 
 /**
@@ -41,7 +40,7 @@ type Props = {
  * (for instance, ARIA props) must be allowed to update without affecting
  * the contents of the editor.
  */
-class DraftEditorContents extends React.Component<Props> {
+class DraftEditorContents extends React.Component {
   shouldComponentUpdate(nextProps: Props): boolean {
     const prevEditorState = this.props.editorState;
     const nextEditorState = nextProps.editorState;
@@ -91,23 +90,11 @@ class DraftEditorContents extends React.Component<Props> {
     );
   }
 
-  render(): React.Node {
+  render(): React.Element<any> {
     const {
-      /* $FlowFixMe(>=0.53.0 site=www,mobile) This comment suppresses an error
-       * when upgrading Flow's support for React. Common errors found when
-       * upgrading Flow's React support are documented at
-       * https://fburl.com/eq7bs81w */
       blockRenderMap,
       blockRendererFn,
-      /* $FlowFixMe(>=0.53.0 site=www,mobile) This comment suppresses an error
-       * when upgrading Flow's support for React. Common errors found when
-       * upgrading Flow's React support are documented at
-       * https://fburl.com/eq7bs81w */
       customStyleMap,
-      /* $FlowFixMe(>=0.53.0 site=www,mobile) This comment suppresses an error
-       * when upgrading Flow's support for React. Common errors found when
-       * upgrading Flow's React support are documented at
-       * https://fburl.com/eq7bs81w */
       customStyleFn,
       editorState,
     } = this.props;
@@ -136,10 +123,7 @@ class DraftEditorContents extends React.Component<Props> {
         customEditable = customRenderer.editable;
       }
 
-      const {textDirectionality} = this.props;
-      const direction = textDirectionality
-        ? textDirectionality
-        : directionMap.get(key);
+      const direction = directionMap.get(key);
       const offsetKey = DraftOffsetKey.encode(key, 0, 0);
       const componentProps = {
         contentState: content,
@@ -156,10 +140,7 @@ class DraftEditorContents extends React.Component<Props> {
         tree: editorState.getBlockTree(key),
       };
 
-      const configForType = (
-        blockRenderMap.get(blockType) ||
-        blockRenderMap.get('unstyled')
-      );
+      const configForType = blockRenderMap.get(blockType);
       const wrapperTemplate = configForType.wrapper;
 
       const Element = (
@@ -180,7 +161,7 @@ class DraftEditorContents extends React.Component<Props> {
         );
         className = joinClasses(
           className,
-          getListItemClasses(blockType, depth, shouldResetCount, direction),
+          getListItemClasses(blockType, depth, shouldResetCount, direction)
         );
       }
 
@@ -188,10 +169,6 @@ class DraftEditorContents extends React.Component<Props> {
       let childProps = {
         className,
         'data-block': true,
-        /* $FlowFixMe(>=0.53.0 site=www,mobile) This comment suppresses an
-         * error when upgrading Flow's support for React. Common errors found
-         * when upgrading Flow's React support are documented at
-         * https://fburl.com/eq7bs81w */
         'data-editor': this.props.editorKey,
         'data-offset-key': offsetKey,
         key,
@@ -207,10 +184,6 @@ class DraftEditorContents extends React.Component<Props> {
       const child = React.createElement(
         Element,
         childProps,
-        /* $FlowFixMe(>=0.53.0 site=www,mobile) This comment suppresses an
-         * error when upgrading Flow's support for React. Common errors found
-         * when upgrading Flow's React support are documented at
-         * https://fburl.com/eq7bs81w */
         <Component {...componentProps} />,
       );
 
@@ -248,7 +221,7 @@ class DraftEditorContents extends React.Component<Props> {
             key: info.key + '-wrap',
             'data-offset-key': info.offsetKey,
           },
-          blocks,
+          blocks
         );
         outputBlocks.push(wrapperElement);
       } else {
@@ -271,7 +244,7 @@ function getListItemClasses(
   type: string,
   depth: number,
   shouldResetCount: boolean,
-  direction: BidiDirection,
+  direction: BidiDirection
 ): string {
   return cx({
     'public/DraftStyleDefault/unorderedListItem':
