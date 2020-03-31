@@ -14,8 +14,8 @@
 'use strict';
 
 import type ContentState from 'ContentState';
-import type {EntityMap} from 'EntityMap';
 import type SelectionState from 'SelectionState';
+import type {EntityMap} from 'EntityMap';
 
 /**
  * Return the entity key that should be used when inserting text for the
@@ -24,7 +24,7 @@ import type SelectionState from 'SelectionState';
  */
 function getEntityKeyForSelection(
   contentState: ContentState,
-  targetSelection: SelectionState,
+  targetSelection: SelectionState
 ): ?string {
   var entityKey;
 
@@ -55,10 +55,10 @@ function getEntityKeyForSelection(
  */
 function filterKey(
   entityMap: EntityMap,
-  entityKey: ?string,
+  entityKey: ?string
 ): ?string {
   if (entityKey) {
-    var entity = entityMap.__get(entityKey);
+    var entity = entityMap._get(entityKey);
     return entity.getMutability() === 'MUTABLE' ? entityKey : null;
   }
   return null;

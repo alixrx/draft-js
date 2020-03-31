@@ -13,7 +13,8 @@
 
 jest.disableAutomock();
 
-var {List} = require('immutable');
+var decodeInlineStyleRanges = require('decodeInlineStyleRanges');
+
 var {
   BOLD,
   BOLD_ITALIC,
@@ -23,7 +24,7 @@ var {
   NONE,
 } = require('SampleDraftInlineStyle');
 
-var decodeInlineStyleRanges = require('decodeInlineStyleRanges');
+var {List} = require('immutable');
 
 function areEqual(a, b) {
   expect(List(a).equals(List(b))).toBeTruthy();
@@ -45,7 +46,7 @@ describe('decodeInlineStyleRanges', function() {
     };
     var decoded = decodeInlineStyleRanges(
       block.text,
-      block.inlineStyleRanges,
+      block.inlineStyleRanges
     );
     areEqual(decoded, Array(block.text.length).fill(BOLD));
   });
@@ -62,7 +63,7 @@ describe('decodeInlineStyleRanges', function() {
     };
     var decoded = decodeInlineStyleRanges(
       block.text,
-      block.inlineStyleRanges,
+      block.inlineStyleRanges
     );
     areEqual(decoded, [
       BOLD_UNDERLINE,
@@ -84,7 +85,7 @@ describe('decodeInlineStyleRanges', function() {
 
     var decoded = decodeInlineStyleRanges(
       block.text,
-      block.inlineStyleRanges,
+      block.inlineStyleRanges
     );
 
     areEqual(decoded, [

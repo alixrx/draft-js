@@ -3,7 +3,7 @@ id: advanced-topics-text-direction
 title: Text Direction
 layout: docs
 category: Advanced Topics
-next: advanced-topics-editorstate-race-conditions
+next: advanced-topics-issues-and-pitfalls
 permalink: docs/advanced-topics-text-direction.html
 ---
 

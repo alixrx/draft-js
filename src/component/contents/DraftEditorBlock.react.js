@@ -13,18 +13,14 @@
 
 'use strict';
 
-import type ContentBlock from 'ContentBlock';
-import type ContentState from 'ContentState';
-import type {DraftDecoratorType} from 'DraftDecoratorType';
-import type SelectionState from 'SelectionState';
-import type {BidiDirection} from 'UnicodeBidiDirection';
-import type {List} from 'immutable';
-
+const ContentBlock = require('ContentBlock');
+const ContentState = require('ContentState');
 const DraftEditorLeaf = require('DraftEditorLeaf.react');
 const DraftOffsetKey = require('DraftOffsetKey');
 const React = require('React');
 const ReactDOM = require('ReactDOM');
 const Scroll = require('Scroll');
+const SelectionState = require('SelectionState');
 const Style = require('Style');
 const UnicodeBidi = require('UnicodeBidi');
 const UnicodeBidiDirection = require('UnicodeBidiDirection');
@@ -33,8 +29,11 @@ const cx = require('cx');
 const getElementPosition = require('getElementPosition');
 const getScrollPosition = require('getScrollPosition');
 const getViewportDimensions = require('getViewportDimensions');
-const invariant = require('invariant');
 const nullthrows = require('nullthrows');
+
+import type {BidiDirection} from 'UnicodeBidiDirection';
+import type {DraftDecoratorType} from 'DraftDecoratorType';
+import type {List} from 'immutable';
 
 const SCROLL_BUFFER = 10;
 
@@ -59,7 +58,7 @@ type Props = {
  * A `DraftEditorBlock` is able to render a given `ContentBlock` to its
  * appropriate decorator and inline style components.
  */
-class DraftEditorBlock extends React.Component<Props> {
+class DraftEditorBlock extends React.Component {
   shouldComponentUpdate(nextProps: Props): boolean {
     return (
       this.props.block !== nextProps.block ||
@@ -68,7 +67,7 @@ class DraftEditorBlock extends React.Component<Props> {
       (
         isBlockOnSelectionEdge(
           nextProps.selection,
-          nextProps.block.getKey(),
+          nextProps.block.getKey()
         ) &&
         nextProps.forceSelection
       )
@@ -107,21 +106,17 @@ class DraftEditorBlock extends React.Component<Props> {
       if (scrollDelta > 0) {
         window.scrollTo(
           scrollPosition.x,
-          scrollPosition.y + scrollDelta + SCROLL_BUFFER,
+          scrollPosition.y + scrollDelta + SCROLL_BUFFER
         );
       }
     } else {
-      invariant(
-        blockNode instanceof HTMLElement,
-        'blockNode is not an HTMLElement',
-      );
       var blockBottom = blockNode.offsetHeight + blockNode.offsetTop;
       var scrollBottom = scrollParent.offsetHeight + scrollPosition.y;
       scrollDelta = blockBottom - scrollBottom;
       if (scrollDelta > 0) {
         Scroll.setTop(
           scrollParent,
-          Scroll.getTop(scrollParent) + scrollDelta + SCROLL_BUFFER,
+          Scroll.getTop(scrollParent) + scrollDelta + SCROLL_BUFFER
         );
       }
     }
@@ -142,14 +137,10 @@ class DraftEditorBlock extends React.Component<Props> {
         var start = leaf.get('start');
         var end = leaf.get('end');
         return (
-          /* $FlowFixMe(>=0.53.0 site=www,mobile) This comment suppresses an
-           * error when upgrading Flow's support for React. Common errors found
-           * when upgrading Flow's React support are documented at
-           * https://fburl.com/eq7bs81w */
           <DraftEditorLeaf
             key={offsetKey}
             offsetKey={offsetKey}
-            block={block}
+            blockKey={blockKey}
             start={start}
             selection={hasSelection ? this.props.selection : undefined}
             forceSelection={this.props.forceSelection}
@@ -182,7 +173,7 @@ class DraftEditorBlock extends React.Component<Props> {
       var decoratorOffsetKey = DraftOffsetKey.encode(blockKey, ii, 0);
       var decoratedText = text.slice(
         leavesForLeafSet.first().get('start'),
-        leavesForLeafSet.last().get('end'),
+        leavesForLeafSet.last().get('end')
       );
 
       // Resetting dir to the same value on a child node makes Chrome/Firefox
@@ -207,11 +198,7 @@ class DraftEditorBlock extends React.Component<Props> {
     }).toArray();
   }
 
-  render(): React.Node {
-    /* $FlowFixMe(>=0.53.0 site=www,mobile) This comment suppresses an error
-     * when upgrading Flow's support for React. Common errors found when
-     * upgrading Flow's React support are documented at
-     * https://fburl.com/eq7bs81w */
+  render(): React.Element<any> {
     const {direction, offsetKey} = this.props;
     const className = cx({
       'public/DraftStyleDefault/block': true,
@@ -232,7 +219,7 @@ class DraftEditorBlock extends React.Component<Props> {
  */
 function isBlockOnSelectionEdge(
   selection: SelectionState,
-  key: string,
+  key: string
 ): boolean {
   return (
     selection.getAnchorKey() === key ||

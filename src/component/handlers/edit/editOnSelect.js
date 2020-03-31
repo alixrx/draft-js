@@ -12,30 +12,25 @@
 
 'use strict';
 
-import type DraftEditor from 'DraftEditor.react';
-
 var EditorState = require('EditorState');
 var ReactDOM = require('ReactDOM');
 
 var getDraftEditorSelection = require('getDraftEditorSelection');
-const invariant = require('invariant');
+
+import type DraftEditor from 'DraftEditor.react';
 
 function editOnSelect(editor: DraftEditor): void {
-  if (editor._blockSelectEvents ||
-      editor._latestEditorState !== editor.props.editorState) {
+  if (editor._blockSelectEvents) {
+    return;
+  }
+  if (editor._latestEditorState !== editor.props.editorState) {
     return;
   }
 
   var editorState = editor.props.editorState;
-  const editorNode = ReactDOM.findDOMNode(editor.refs.editorContainer);
-  invariant(editorNode, 'Missing editorNode');
-  invariant(
-    editorNode.firstChild instanceof HTMLElement,
-    'editorNode.firstChild is not an HTMLElement',
-  );
   var documentSelection = getDraftEditorSelection(
     editorState,
-    editorNode.firstChild,
+    ReactDOM.findDOMNode(editor.refs.editorContainer).firstChild
   );
   var updatedSelectionState = documentSelection.selectionState;
 
@@ -43,12 +38,12 @@ function editOnSelect(editor: DraftEditor): void {
     if (documentSelection.needsRecovery) {
       editorState = EditorState.forceSelection(
         editorState,
-        updatedSelectionState,
+        updatedSelectionState
       );
     } else {
       editorState = EditorState.acceptSelection(
         editorState,
-        updatedSelectionState,
+        updatedSelectionState
       );
     }
     editor.update(editorState);

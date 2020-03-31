@@ -22,7 +22,7 @@ server.noconvert = true;
 // requests.
 var queue = Promise.resolve();
 
-glob('src/**/*', {nodir: true}, function(er, files) {
+glob('src/**/*.*', function(er, files) {
   files.forEach(function(file) {
     var targetFile = file.replace(/^src/, 'build');
 
@@ -56,7 +56,7 @@ glob('src/**/*', {nodir: true}, function(er, files) {
   });
 
   queue = queue.then(function() {
-    console.log('It is live at: http://draftjs.org/');
+    console.log('It is live at: http://facebook.github.io/draft-js/');
   }).finally(function() {
     server.close();
   }).catch(function(e) {

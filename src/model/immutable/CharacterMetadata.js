@@ -13,21 +13,17 @@
 
 'use strict';
 
-import type {DraftInlineStyle} from 'DraftInlineStyle';
-
 var {
   Map,
   OrderedSet,
   Record,
 } = require('immutable');
 
-// Immutable.map is typed such that the value for every key in the map
-// must be the same type
-type CharacterMetadataConfigValueType = DraftInlineStyle | ?string;
+import type {DraftInlineStyle} from 'DraftInlineStyle';
 
 type CharacterMetadataConfig = {
-  style?: CharacterMetadataConfigValueType,
-  entity?: CharacterMetadataConfigValueType,
+  style?: DraftInlineStyle,
+  entity?: ?string,
 };
 
 const EMPTY_SET = OrderedSet();
@@ -49,12 +45,12 @@ class CharacterMetadata extends CharacterMetadataRecord {
   }
 
   hasStyle(style: string): boolean {
-    return this.getStyle().includes(style);
+    return this.getStyle().has(style);
   }
 
   static applyStyle(
     record: CharacterMetadata,
-    style: string,
+    style: string
   ): CharacterMetadata {
     var withStyle = record.set('style', record.getStyle().add(style));
     return CharacterMetadata.create(withStyle);
@@ -62,7 +58,7 @@ class CharacterMetadata extends CharacterMetadataRecord {
 
   static removeStyle(
     record: CharacterMetadata,
-    style: string,
+    style: string
   ): CharacterMetadata {
     var withoutStyle = record.set('style', record.getStyle().remove(style));
     return CharacterMetadata.create(withoutStyle);
@@ -70,7 +66,7 @@ class CharacterMetadata extends CharacterMetadataRecord {
 
   static applyEntity(
     record: CharacterMetadata,
-    entityKey: ?string,
+    entityKey: ?string
   ): CharacterMetadata {
     var withEntity = record.getEntity() === entityKey ?
       record :
@@ -89,11 +85,9 @@ class CharacterMetadata extends CharacterMetadataRecord {
       return EMPTY;
     }
 
-    const defaultConfig: CharacterMetadataConfig =
-      {style: EMPTY_SET, entity: (null: ?string)};
-
     // Fill in unspecified properties, if necessary.
-    var configMap = Map(defaultConfig).merge(config);
+    var configMap =
+      Map({style: EMPTY_SET, entity: (null: ?string)}).merge(config);
 
     var existing: ?CharacterMetadata = pool.get(configMap);
     if (existing) {
@@ -107,9 +101,7 @@ class CharacterMetadata extends CharacterMetadataRecord {
 }
 
 var EMPTY = new CharacterMetadata();
-var pool: Map<Map<any, any>, CharacterMetadata> = Map(
-  [[Map(defaultRecord), EMPTY]],
-);
+var pool: Map<Map<any, any>, CharacterMetadata> = Map([[Map(defaultRecord), EMPTY]]);
 
 CharacterMetadata.EMPTY = EMPTY;
 

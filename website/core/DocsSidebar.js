@@ -73,7 +73,7 @@ var DocsSidebar = React.createClass({
     if (metadata.permalink.match(/^https?:/)) {
       return metadata.permalink;
     }
-    return '/' + metadata.permalink + '#content';
+    return '/draft-js/' + metadata.permalink + '#content';
   },
 
   render: function() {

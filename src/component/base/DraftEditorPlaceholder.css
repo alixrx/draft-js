@@ -1,16 +1,15 @@
 /**
  * @providesModule DraftEditorPlaceholder
- * @permanent
  */
 
 .public/DraftEditorPlaceholder/root {
-  color: var(fig-secondary-text);
+  color: var(fbui-desktop-text-placeholder);
   position: absolute;
-  z-index: 1;
+  z-index: 0;
 }
 
 .public/DraftEditorPlaceholder/hasFocus {
-  color: var(fig-light-20);
+  color: var(fbui-desktop-text-placeholder-focused);
 }
 
 .DraftEditorPlaceholder/hidden {

@@ -14,7 +14,6 @@
 jest.disableAutomock();
 
 var Immutable = require('immutable');
-
 var insertIntoList = require('insertIntoList');
 
 describe('insertIntoList', () => {
@@ -24,7 +23,7 @@ describe('insertIntoList', () => {
     var result = insertIntoList(
       list,
       Immutable.List.of(100, 101, 102),
-      list.size,
+      list.size
     );
     expect(result.size).toBe(8);
     expect(result.toJS()).toEqual([0, 1, 2, 3, 4, 100, 101, 102]);
@@ -34,7 +33,7 @@ describe('insertIntoList', () => {
     var result = insertIntoList(
       list,
       Immutable.List.of(100, 101, 102),
-      0,
+      0
     );
     expect(result.size).toBe(8);
     expect(result.toJS()).toEqual([100, 101, 102, 0, 1, 2, 3, 4]);
@@ -44,7 +43,7 @@ describe('insertIntoList', () => {
     var result = insertIntoList(
       list,
       Immutable.List.of(100, 101, 102),
-      3,
+      3
     );
     expect(result.size).toBe(8);
     expect(result.toJS()).toEqual([0, 1, 2, 100, 101, 102, 3, 4]);
