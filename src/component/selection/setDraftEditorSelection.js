@@ -138,11 +138,9 @@ function addFocusToSelection(
     // Additionally, clone the selection range. IE11 throws an
     // InvalidStateError when attempting to access selection properties
     // after the range is detached.
-    if (selection.rangeCount === 1) {
-      var range = selection.getRangeAt(0);
-      range.setEnd(node, offset);
-      selection.addRange(range.cloneRange());
-    }
+    var range = selection.getRangeAt(0);
+    range.setEnd(node, offset);
+    selection.addRange(range.cloneRange());
   }
 }
 
