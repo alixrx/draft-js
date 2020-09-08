@@ -1,7 +1,7 @@
 {
-  "name": "draft-js",
+  "name": "amber-editor4",
   "description": "A React framework for building text editors.",
-  "version": "0.9.0",
+  "version": "0.2.0",
   "keywords": [
     "draftjs",
     "editor",
