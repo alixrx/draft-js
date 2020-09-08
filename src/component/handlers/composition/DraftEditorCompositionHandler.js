@@ -18,8 +18,7 @@ const Keys = require('Keys');
 
 const getEntityKeyForSelection = require('getEntityKeyForSelection');
 const isSelectionAtLeafStart = require('isSelectionAtLeafStart');
-
-import type DraftEditor from 'DraftEditor.react';
+const isEventHandled = require('isEventHandled');
 
 /**
  * Millisecond delay to allow `compositionstart` to fire again upon
@@ -44,7 +43,7 @@ let stillComposing = false;
 let textInputData = '';
 
 var DraftEditorCompositionHandler = {
-  onBeforeInput: function (e: SyntheticInputEvent): void {
+  onBeforeInput: function(e: SyntheticInputEvent): void {
     var chars = e.data;
 
     // Allow the top-level component to handle the insertion manually. This is
@@ -66,7 +65,7 @@ var DraftEditorCompositionHandler = {
    * A `compositionstart` event has fired while we're still in composition
    * mode. Continue the current composition session to prevent a re-render.
    */
-  onCompositionStart: function (editor: DraftEditor): void {
+  onCompositionStart: function(): void {
     stillComposing = true;
   },
 
@@ -84,12 +83,12 @@ var DraftEditorCompositionHandler = {
    * twice could break the DOM, we only use the first event. Example: Arabic
    * Google Input Tools on Windows 8.1 fires `compositionend` three times.
    */
-  onCompositionEnd: function (editor: DraftEditor): void {
+  onCompositionEnd: function(): void {
     resolved = false;
     stillComposing = false;
     setTimeout(() => {
       if (!resolved) {
-        DraftEditorCompositionHandler.resolveComposition(editor);
+        DraftEditorCompositionHandler.resolveComposition.call(this);
       }
     }, RESOLVE_DELAY);
   },
@@ -99,14 +98,14 @@ var DraftEditorCompositionHandler = {
    * the arrow keys are used to commit, prevent default so that the cursor
    * doesn't move, otherwise it will jump back noticeably on re-render.
    */
-  onKeyDown: function (editor: DraftEditor, e: SyntheticKeyboardEvent): void {
+  onKeyDown: function(e: SyntheticKeyboardEvent): void {
     if (!stillComposing) {
       // If a keydown event is received after compositionend but before the
       // 20ms timer expires (ex: type option-E then backspace, or type A then
       // backspace in 2-Set Korean), we should immediately resolve the
       // composition and reinterpret the key press in edit mode.
-      DraftEditorCompositionHandler.resolveComposition(editor);
-      editor._onKeyDown(e);
+      DraftEditorCompositionHandler.resolveComposition.call(this);
+      this._onKeyDown(e);
       return;
     }
     if (e.which === Keys.RIGHT || e.which === Keys.LEFT) {
@@ -120,7 +119,7 @@ var DraftEditorCompositionHandler = {
    * characters that we do not want. `preventDefault` allows the composition
    * to be committed while preventing the extra characters.
    */
-  onKeyPress: function (editor: DraftEditor, e: SyntheticKeyboardEvent): void {
+  onKeyPress: function(e: SyntheticKeyboardEvent): void {
     if (e.which === Keys.RETURN) {
       e.preventDefault();
     }
@@ -141,7 +140,7 @@ var DraftEditorCompositionHandler = {
    * Resetting innerHTML will move focus to the beginning of the editor,
    * so we update to force it back to the correct place.
    */
-  resolveComposition: function (editor: DraftEditor): void {
+  resolveComposition: function(): void {
     if (stillComposing) {
       return;
     }
@@ -150,7 +149,7 @@ var DraftEditorCompositionHandler = {
     const composedChars = textInputData;
     textInputData = '';
 
-    const editorState = EditorState.set(editor._latestEditorState, {
+    const editorState = EditorState.set(this._latestEditorState, {
       inCompositionMode: false,
     });
 
@@ -168,10 +167,10 @@ var DraftEditorCompositionHandler = {
     );
 
     if (mustReset) {
-      editor.restoreEditorDOM();
+      this.restoreEditorDOM();
     }
 
-    editor.exitCurrentMode();
+    this.exitCurrentMode();
 
     if (composedChars) {
       // If characters have been composed, re-rendering with the update
@@ -183,7 +182,7 @@ var DraftEditorCompositionHandler = {
         currentStyle,
         entityKey
       );
-      editor.update(
+      this.update(
         EditorState.push(
           editorState,
           contentState,
@@ -194,7 +193,7 @@ var DraftEditorCompositionHandler = {
     }
 
     if (mustReset) {
-      editor.update(
+      this.update(
         EditorState.set(editorState, {
           nativelyRenderedContent: null,
           forceSelection: true,
